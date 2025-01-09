@@ -1,2 +1,1 @@
-# codeAndTell
-Side Projects meets Christian Mingle meets Forum
+# SET UP READ ME
