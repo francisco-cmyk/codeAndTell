@@ -1,3 +1,5 @@
+import { supabase } from "../../config/supabaseConfig";
+import useGetPosts from "../../hooks/useGetPosts";
 import { Badge } from "../ui-lib/Badge";
 import {
   Card,
@@ -11,7 +13,7 @@ import {
 type MockDataType = {
   title: string;
   description: string;
-  imageSrc: string[];
+  imgSource: string[];
   badges: string[];
 };
 
@@ -20,7 +22,7 @@ const mockData: MockDataType[] = [
     title: "Side-Project App",
     description:
       "An app that puts side projects, coding help, and other devs like you within reach.",
-    imageSrc: [
+    imgSource: [
       "public/i will soon forget.jpg",
       "public/i will soon forget.jpg",
       "public/i will soon forget.jpg",
@@ -30,7 +32,7 @@ const mockData: MockDataType[] = [
   {
     title: "Communism Made Easy",
     description: " Revolution today, 72 virgins in heaven tomorrow.",
-    imageSrc: [
+    imgSource: [
       "public/i will soon forget.jpg",
       "public/i will soon forget.jpg",
       "public/i will soon forget.jpg",
@@ -41,7 +43,7 @@ const mockData: MockDataType[] = [
     title: "Erm, I need help??!",
     description:
       "My wife says I play too many video games. I throwed my switch at her",
-    imageSrc: [
+    imgSource: [
       "public/i will soon forget.jpg",
       "public/i will soon forget.jpg",
       "public/i will soon forget.jpg",
@@ -51,27 +53,31 @@ const mockData: MockDataType[] = [
 ];
 
 export default function Feed() {
+  const { data: posts = [], isLoading: isLoadingPosts } = useGetPosts();
+
   return (
     <div
       className={`grid grid-cols-1 gap-y-12 p-12 w-3/4 h-screen place-self-center overflow-y-scroll no-scrollbar`}
     >
-      {mockData.map((data, index) => (
+      {posts.map((post, index) => (
         <Card
-          key={`${data.title}-${index}`}
-          className={`w-3/4 h-content place-self-center bg-[#000F2C] border-[#4E72C2]`}
+          key={`${post.title}-${index}`}
+          className={`w-3/4 h-content place-self-center bg-slate-50 dark:bg-[#000F2C] dark:border-[#4E72C2]`}
         >
           <CardHeader className=''>
-            <CardTitle className={`text-[#97B5EE] text-2xl`}>
-              {data.title}
+            <CardTitle className={`dark:text-[#97B5EE] text-2xl`}>
+              {post.title}
             </CardTitle>
-            <CardDescription className={`text-[#4E72C2]`}>
-              {data.description}
+            <CardDescription className={`dark:text-[#4E72C2]`}>
+              {post.description}
             </CardDescription>
           </CardHeader>
           <CardContent
-            className={`h-[300px] mx-6 mb-6 p-4 overflow-y-scroll no-scrollbar border-white border-[0.5px]`}
+            className={`${
+              post.imgSource.length > 0 ? `h-[300px]` : `hidden`
+            } mx-6 mb-6 p-4 overflow-y-scroll no-scrollbar border-white border-[0.5px]`}
           >
-            {data.imageSrc.map((image, index) => (
+            {post.imgSource.map((image, index) => (
               <img
                 key={`${image}-${index}`}
                 src={image}
@@ -80,11 +86,11 @@ export default function Feed() {
             ))}
           </CardContent>
           <CardFooter>
-            {data.badges.map((badge, index) => (
+            {post.badges.map((badge, index) => (
               <Badge
                 key={`${badge}-${index}`}
                 variant={"outline"}
-                className={`mr-2 text-white`}
+                className={`mr-2 dark:text-white`}
               >
                 {badge}
               </Badge>

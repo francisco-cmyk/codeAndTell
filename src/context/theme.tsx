@@ -33,7 +33,7 @@ export const DarkModeProvider: React.FC<ProviderPops> = ({ children }) => {
       localStorage.setItem("theme", "dark");
     } else {
       root.classList.remove("dark");
-      document.body.className = "bg-[#000F2C]"; // TODO CHANGE
+      document.body.className = "bg-slate-100"; // TODO CHANGE
       localStorage.setItem("theme", "light");
     }
   }, [isDarkMode]);
