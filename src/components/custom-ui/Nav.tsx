@@ -12,7 +12,7 @@ export default function Nav() {
   const { isDarkMode, setIsDarkMode } = useDarkMode();
 
   return (
-    <div className='sticky flex justify-between dark:bg-slate-950 bg-slate-100 top-0 border-solid border-b-2 w-screen p-4 z-50'>
+    <div className='sticky flex justify-between dark:bg-slate-950 bg-slate-100 top-0 dark:border-white border-solid border-b-2 w-full p-4 z-50'>
       <NavigationMenu>
         <NavigationMenuLink
           className={`bg-transparent text-2xl  dark:text-[#97B5EE] font-semibold select-none hover:bg-transparent hover:cursor-pointer`}

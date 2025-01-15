@@ -1,4 +1,3 @@
-import { supabase } from "../../config/supabaseConfig";
 import useGetPosts from "../../hooks/useGetPosts";
 import { Badge } from "../ui-lib/Badge";
 import {
@@ -9,48 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui-lib/Card";
-
-type MockDataType = {
-  title: string;
-  description: string;
-  imgSource: string[];
-  badges: string[];
-};
-
-const mockData: MockDataType[] = [
-  {
-    title: "Side-Project App",
-    description:
-      "An app that puts side projects, coding help, and other devs like you within reach.",
-    imgSource: [
-      "public/i will soon forget.jpg",
-      "public/i will soon forget.jpg",
-      "public/i will soon forget.jpg",
-    ],
-    badges: ["2-3 Devs", "Discord", "Short Project"],
-  },
-  {
-    title: "Communism Made Easy",
-    description: " Revolution today, 72 virgins in heaven tomorrow.",
-    imgSource: [
-      "public/i will soon forget.jpg",
-      "public/i will soon forget.jpg",
-      "public/i will soon forget.jpg",
-    ],
-    badges: ["2-3 Devs", "Discord", "Short Project"],
-  },
-  {
-    title: "Erm, I need help??!",
-    description:
-      "My wife says I play too many video games. I throwed my switch at her",
-    imgSource: [
-      "public/i will soon forget.jpg",
-      "public/i will soon forget.jpg",
-      "public/i will soon forget.jpg",
-    ],
-    badges: ["2-3 Devs", "Discord", "Short Project"],
-  },
-];
 
 export default function Feed() {
   const { data: posts = [], isLoading: isLoadingPosts } = useGetPosts();
