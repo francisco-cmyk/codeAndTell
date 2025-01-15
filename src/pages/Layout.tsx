@@ -1,12 +1,14 @@
 import { Outlet } from "react-router-dom";
 import "../index.css";
 import Nav from "../components/custom-ui/Nav";
+import Sidebar from "../components/custom-ui/Sidebar";
 
 export default function Layout() {
   return (
-    <div className='sm:min-h-screen min-h-dvh w-screen flex flex-col relative '>
+    <div className='max-h-dvh w-full flex flex-col relative overflow-y-scroll no-scrollbar'>
       <Nav />
-      <main className={`w-full min-h-full `}>
+      <main className={`flex flex-row w-full min-h-full`}>
+        <Sidebar />
         <Outlet />
       </main>
     </div>
