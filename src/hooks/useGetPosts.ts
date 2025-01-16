@@ -10,7 +10,7 @@ const PostSchema = z.object({
   updated_by_id: z.nullable(z.string()),
   title: z.nullable(z.string()),
   description: z.nullable(z.string()),
-  badges: z.nullable(z.array(z.string())),
+  badges: z.nullable(z.array(z.string())), // Shouldn't be nullable and limit ?
   img_source: z.nullable(z.array(z.string())),
 });
 
