@@ -5,6 +5,7 @@ import Layout from "./pages/Layout";
 import Feed from "./components/custom-ui/Feed";
 import Login from "./pages/Login";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import NewPost from "./pages/NewPost";
 
 const queryClient = new QueryClient();
 
@@ -17,6 +18,7 @@ function App() {
             <Route path='/' element={<Layout />}>
               <Route index element={<Feed />} />
               <Route path='login' element={<Login />} />
+              <Route path='submit' element={<NewPost />} />
               {/* <Route path='nameOfPage' element={<CustomPage />} /> */}
             </Route>
           </Routes>

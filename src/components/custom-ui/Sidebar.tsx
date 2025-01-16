@@ -9,8 +9,7 @@ import {
   NavigationMenuViewport,
 } from "../ui-lib/NavigationMenu";
 
-import { Button } from "../ui-lib/Button";
-
+import { Link } from "react-router-dom";
 
 export default function Sidebar () {
   return (
@@ -18,7 +17,7 @@ export default function Sidebar () {
       <NavigationMenu className={`flex items-start min-w-full`}>
         <NavigationMenuList className='grid grid-cols-1 gap-y-4'>
           <NavigationMenuItem>
-            <Button> new + </Button>
+            <Link to={"/submit"}> new + </Link>
           </NavigationMenuItem>
           <NavigationMenuItem>
             <NavigationMenuLink className={`hover:cursor-pointer hover:dark:bg-slate-300`}>
