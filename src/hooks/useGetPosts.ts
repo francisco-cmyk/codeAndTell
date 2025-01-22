@@ -1,6 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../config/supabaseConfig";
 import { z } from "zod";
+import { formatTimestamp } from "../lib/utils";
+import { toast } from "react-toastify";
+import { PostgrestError } from "@supabase/supabase-js";
 
 const PostSchema = z.object({
   id: z.number(),
@@ -11,7 +14,15 @@ const PostSchema = z.object({
   title: z.nullable(z.string()),
   description: z.nullable(z.string()),
   badges: z.nullable(z.array(z.string())), // Shouldn't be nullable and limit ?
-  img_source: z.nullable(z.array(z.string())),
+  media_source: z.nullable(z.array(z.string())),
+  media_size: z.nullable(z.number()),
+  media_name: z.nullable(z.string()),
+  media_type: z.nullable(z.string()),
+  profiles: z.object({
+    id: z.string(),
+    avatar_url: z.string(),
+    full_name: z.string(),
+  }),
 });
 
 type PostDBType = z.infer<typeof PostSchema>;
@@ -25,23 +36,52 @@ type PostType = {
   title: string | null;
   description: string | null;
   badges: string[];
-  imgSource: string[];
+  mediaSource: string[];
+  mediaSize: number;
+  mediaName: string;
+  mediaType: string;
+  mediaUrl: string[];
+  profile: {
+    id: string;
+    avatarURL: string;
+    name: string;
+  };
 };
 
 async function fetchPosts(): Promise<PostDBType[] | undefined> {
   try {
-    const { data } = await supabase.from("Content").select();
+    const { data } = await supabase.from("content").select(
+      `
+            id,
+            created_at,
+            updated_at,
+            created_by_id,
+            updated_by_id,
+            title,
+            description,
+            badges,
+            media_source,
+            media_type,
+            media_size,
+            media_name,
+            profiles (
+                id,
+                full_name,
+                avatar_url
+            )
+        `
+    );
 
     if (data) {
-      const test = data.map((datum) => {
-        return PostSchema.parse(datum);
-      });
-      return test;
+      return data.map((datum) => PostSchema.parse(datum));
     } else {
       [];
     }
   } catch (error) {
-    console.warn(`There was an error: ${error}`);
+    const Error = error as PostgrestError;
+    toast.error(`Error was an error retrieving posts:, ${Error.message}`, {
+      toastId: "fetchPostsError",
+    });
   }
 }
 
@@ -51,17 +91,52 @@ export default function useGetPosts() {
     queryFn: async () => {
       const data = await fetchPosts();
 
-      return (data ?? []).map((datum) => ({
+      const posts = (data ?? []).map((datum) => ({
         id: datum.id,
-        createdAt: datum.created_at,
+        createdAt: formatTimestamp(datum.created_at),
         updatedAt: datum.updated_at,
         createdById: datum.created_by_id,
         updatedById: datum.updated_by_id,
         title: datum.title,
         description: datum.description,
         badges: datum.badges ?? [],
-        imgSource: datum.img_source ?? [],
+        mediaSource: datum.media_source ?? [],
+        mediaSize: datum.media_size ?? 0,
+        mediaName: datum.media_name ?? "None",
+        mediaType: datum.media_type ?? "None",
+        mediaUrl: [],
+        profile: {
+          id: datum.profiles.id,
+          avatarURL: datum.profiles.avatar_url,
+          name: datum.profiles.full_name,
+        },
       }));
+
+      const postsWithMedia = await Promise.all(
+        posts.map(async (post) => {
+          if (!post.mediaSource) {
+            return { ...post, mediaUrl: [] };
+          }
+
+          const publicUrls = await Promise.all(
+            post.mediaSource.map(async (path) => {
+              path = path.trim().toLowerCase();
+              const { data } = await supabase.storage
+                .from("media")
+                .getPublicUrl(path);
+
+              return data.publicUrl;
+            })
+          );
+
+          return {
+            ...post,
+            mediaUrl: publicUrls,
+          };
+        })
+      );
+
+      return postsWithMedia;
     },
   });
 }

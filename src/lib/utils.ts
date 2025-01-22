@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { formatDistanceToNow } from "date-fns";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -15,14 +16,17 @@ export default function getMergeState<State>(
   };
 }
 
-export function formatDateToDMY(timestamp: Date) {
-  const date = new Date(timestamp);
+export function formatTimestamp(timestamp: string) {
+  return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
+}
 
-  // Extract day, month, and year
-  const day = String(date.getUTCDate()).padStart(2, "0"); // Ensure 2 digits
-  const month = String(date.getUTCMonth() + 1).padStart(2, "0"); // Months are 0-indexed
-  const year = date.getUTCFullYear();
+export function createAcronym(name: string, length = 2) {
+  if (!name || typeof name !== "string") {
+    return "";
+  }
 
-  // Return formatted string
-  return `${day}/${month}/${year}`;
+  const words = name.trim().split(/\s+/);
+  let acronym = words.map((word) => word[0].toUpperCase()).join("");
+
+  return acronym.slice(0, length);
 }
