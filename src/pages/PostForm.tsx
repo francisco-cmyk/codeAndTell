@@ -27,8 +27,6 @@ const tagList = [
 
 
 export default function PostForm() {
-  const [selectedTags, setSelectedTags] = useState<string[]>(["discrod", "torture"]);
-
   const formSchema = z.object({
     title: z.string().min(2).max(50),
     outburst: z.string().min(2).max(50),
@@ -101,8 +99,9 @@ export default function PostForm() {
                 <FormLabel>Tags</FormLabel>
                 <MultiSelect
                   options={tagList}
-                  onValueChange={setSelectedTags}
-                  defaultValue={selectedTags}
+                  onValueChange={(value) => {
+                    form.setValue("tags", value)
+                  }}
                   placeholder="Select tags"
                   variant="inverted"
                   animation={2}
