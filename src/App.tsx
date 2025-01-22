@@ -22,7 +22,7 @@ function App() {
             <Route path='signup' element={<SignUp />} />
             <Route path='/' element={<Layout />}>
               <Route index element={<Feed />} />
-              <Route path='/createPost' element={<PostForm />} />
+              <Route path='/submit' element={<PostForm />} />
               <Route path='/ask4help' element={<HelpPage />} />
               <Route path='/myPosts' element={<UserPosts />} />
             </Route>
