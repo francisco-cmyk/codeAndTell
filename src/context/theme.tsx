@@ -6,21 +6,19 @@ import React, {
   useState,
 } from "react";
 
-type DarkModeContextType = {
+type ThemeContextType = {
   isDarkMode: boolean;
   setIsDarkMode: (value: boolean) => void;
   githubLogoMode: string;
 };
 
-const DarkModeContext = createContext<DarkModeContextType | undefined>(
-  undefined
-);
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 type ProviderPops = {
   children: ReactNode;
 };
 
-export const DarkModeProvider: React.FC<ProviderPops> = ({ children }) => {
+export const ThemeContextProvider: React.FC<ProviderPops> = ({ children }) => {
   const [isDarkMode, setIsDarkMode] = useState(() => {
     if (localStorage.getItem("theme") === "dark") return true;
     return false;
@@ -45,16 +43,16 @@ export const DarkModeProvider: React.FC<ProviderPops> = ({ children }) => {
   }, [isDarkMode]);
 
   return (
-    <DarkModeContext.Provider
+    <ThemeContext.Provider
       value={{ isDarkMode, setIsDarkMode, githubLogoMode }}
     >
       {children}
-    </DarkModeContext.Provider>
+    </ThemeContext.Provider>
   );
 };
 
-export const useDarkMode = (): DarkModeContextType => {
-  const context = useContext(DarkModeContext);
+export const useDarkMode = (): ThemeContextType => {
+  const context = useContext(ThemeContext);
   if (!context) {
     throw new Error("useDarkMode must be used within a DarkModeProvider");
   }

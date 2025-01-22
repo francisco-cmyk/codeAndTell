@@ -1,26 +1,45 @@
 import "./App.css";
-import { DarkModeProvider } from "./context/theme";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Layout from "./pages/Layout";
 import Feed from "./components/custom-ui/Feed";
-import Login from "./pages/Login";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import HelpPage from "./pages/HelpPage";
 import PostForm from "./pages/PostForm";
 import UserPosts from "./pages/UserPosts";
-import SignUp from "./pages/SignUp";
+import { ToastContainer } from "react-toastify";
+import { AuthenticationProvider } from "./context/auth";
+import "react-toastify/dist/ReactToastify.css";
 
 const queryClient = new QueryClient();
 
+const contextClass = {
+  success: "dark:bg-zinc-800 bg-zinc-50 text-zinc-500 dark:text-zinc-50",
+  error: "bg-red-50 text-zinc-900",
+  info: "dark:bg-zinc-800 dark:text-zinc-50 bg-zinc-50 text-zinc-900",
+  warning: "bg-orange-400 dark:bg-orange-200 dark:text-zinc-600",
+  default: "bg-indigo-600",
+  dark: "bg-white-600 font-gray-300",
+};
+
 function App() {
   return (
-    <DarkModeProvider>
-      <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <AuthenticationProvider>
+        <ToastContainer
+          position='top-right'
+          autoClose={5000}
+          toastClassName={(context) =>
+            contextClass[context?.type || "default"] +
+            " relative flex min-h-10 p-6 rounded-md justify-between overflow-hidden cursor-pointer"
+          }
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+        />
         <Router>
           <Routes>
-            <Route path='login' element={<Login />} />
-            <Route path='signup' element={<SignUp />} />
-
             <Route path='/' element={<Layout />}>
               <Route index element={<Feed />} />
               <Route path='/createPost' element={<PostForm />} />
@@ -29,13 +48,9 @@ function App() {
             </Route>
           </Routes>
         </Router>
-      </QueryClientProvider>
-    </DarkModeProvider>
+      </AuthenticationProvider>
+    </QueryClientProvider>
   );
 }
 
 export default App;
-
-{
-  /* <Route path='nameOfPage' element={<CustomPage />} /> */
-}
