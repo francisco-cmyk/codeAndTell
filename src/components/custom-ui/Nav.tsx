@@ -7,32 +7,23 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
 } from "../ui-lib/NavigationMenu";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui-lib/Avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "../ui-lib/Dropdown";
-import { Link } from "react-router-dom";
 import UserProfile from "./UserProfile";
 
-type NavPropsTypes = {
-  isLoginPage?: boolean;
+type NavProps = {
+  setLoginOpen: () => void;
 };
 
-export default function Nav(props: NavPropsTypes) {
+export default function Nav(props: NavProps) {
   const { isDarkMode, setIsDarkMode } = useDarkMode();
 
   return (
-    <div className='sticky flex justify-between dark:bg-background bg-slate-100 top-0 dark:border-white border-solid border-b-2 min-w-full p-4 z-50'>
+    <div className='sticky flex justify-between dark:bg-background bg-slate-100 top-0  border-solid border-b min-w-full p-4 z-50'>
       <NavigationMenu>
         <NavigationMenuLink
+          href='/'
           className={`bg-transparent text-2xl  dark:text-white font-semibold select-none hover:bg-transparent hover:cursor-pointer`}
         >
-          <Link to='/'>codeAndTell</Link>
+          <p>codeAndTell</p>
         </NavigationMenuLink>
         <NavigationMenuList>
           <NavigationMenuItem className=''></NavigationMenuItem>
@@ -40,7 +31,7 @@ export default function Nav(props: NavPropsTypes) {
       </NavigationMenu>
 
       <div className={`flex items-center mr-4`}>
-        <UserProfile isLoginPage={props.isLoginPage} />
+        <UserProfile setLoginOpen={props.setLoginOpen} />
         <Button
           size='icon'
           variant='ghost'

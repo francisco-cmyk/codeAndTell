@@ -13,16 +13,22 @@ import {
 } from "../components/ui-lib/Form";
 import { Input } from "../components/ui-lib/Input";
 import { Textarea } from "../components/ui-lib/TextArea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../components/ui-lib/Select";
+import { MultiSelect } from "../components/ui-lib/MultiSelect";
+import { useState } from "react";
+import { Cat, Dog, Fish, Rabbit, Turtle } from "lucide-react";
+
+const tagList = [
+  { value: "discrod", label: "discrod", icon: Turtle },
+  { value: "torture", label: "torture", icon: Cat },
+  { value: "fun", label: "fun", icon: Dog },
+  { value: "easy", label: "easy", icon: Rabbit },
+  { value: "dev hell", label: "dev hell", icon: Fish },
+];
 
 
 export default function PostForm() {
+  const [selectedTags, setSelectedTags] = useState<string[]>(["discrod", "torture"]);
+
   const formSchema = z.object({
     title: z.string().min(2).max(50),
     outburst: z.string().min(2).max(50),
@@ -36,7 +42,7 @@ export default function PostForm() {
       title: "",
       outburst: "",
       body: "",
-      tags: [""]
+      tags: []
     }
   });
 
@@ -91,46 +97,17 @@ export default function PostForm() {
             control={form.control}
             name="tags"
             render={({ field }) => (
-              <FormItem className="">
+              <FormItem>
                 <FormLabel>Tags</FormLabel>
-                <div className="flex flex-row">
-                  <FormControl>
-                    <Select>
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Tags" />
-                      </SelectTrigger>
-                      <SelectContent {...field}>
-                        <SelectItem value="easy"> Easy </SelectItem>
-                        <SelectItem value="medium"> Medium </SelectItem>
-                        <SelectItem value="hard"> Hard </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormControl>
-                    <Select>
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Tags" />
-                      </SelectTrigger>
-                      <SelectContent {...field}>
-                        <SelectItem value="easy"> Easy </SelectItem>
-                        <SelectItem value="medium"> Medium </SelectItem>
-                        <SelectItem value="hard"> Hard </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormControl>
-                    <Select>
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Tags" />
-                      </SelectTrigger>
-                      <SelectContent {...field}>
-                        <SelectItem value="easy"> Easy </SelectItem>
-                        <SelectItem value="medium"> Medium </SelectItem>
-                        <SelectItem value="hard"> Hard </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                </div>
+                <MultiSelect
+                  options={tagList}
+                  onValueChange={setSelectedTags}
+                  defaultValue={selectedTags}
+                  placeholder="Select tags"
+                  variant="inverted"
+                  animation={2}
+                  maxCount={3}
+                />
               </FormItem>
             )}
           />

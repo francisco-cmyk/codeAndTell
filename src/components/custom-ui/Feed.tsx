@@ -1,4 +1,6 @@
 import useGetPosts from "../../hooks/useGetPosts";
+import { createAcronym } from "../../lib/utils";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui-lib/Avatar";
 import { Badge } from "../ui-lib/Badge";
 import {
   Card,
@@ -21,7 +23,10 @@ export default function Feed() {
     >
       {isLoadingPosts
         ? placeholders.map((_, index) => (
-            <Skeleton className={`w-3/5 min-h-[300px] place-self-center`} />
+            <Skeleton
+              key={index}
+              className={`w-3/5 min-h-[300px] place-self-center`}
+            />
           ))
         : posts.map((post, index) => (
             <Card
@@ -29,17 +34,29 @@ export default function Feed() {
               className={`w-3/5 h-content place-self-center dark:bg-zinc-900`}
             >
               <CardHeader className=''>
-                <CardTitle className={` text-2xl`}>{post.title}</CardTitle>
+                <CardTitle className={`text-2xl mb-1`}>{post.title}</CardTitle>
+                <CardDescription className='w-full flex justify-between text-xs '>
+                  <div className='flex items-center'>
+                    <Avatar className='h-5 w-5 mr-2'>
+                      <AvatarImage src={post.profile.avatarURL} alt='@shadcn' />
+                      <AvatarFallback>
+                        {createAcronym(post.profile.name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <p>{post.profile.name}</p>
+                  </div>
+                  <p>{post.createdAt}</p>
+                </CardDescription>
                 <CardDescription className={`dark:text-slate-50`}>
                   {post.description}
                 </CardDescription>
               </CardHeader>
               <CardContent
                 className={`${
-                  post.imgSource.length > 0 ? `h-[300px]` : `hidden`
+                  post.mediaSource.length > 0 ? `h-[300px]` : `hidden`
                 } mx-6 mb-6 p-4 overflow-y-scroll no-scrollbar border-white border-[0.5px]`}
               >
-                {post.imgSource.map((image, index) => (
+                {post.mediaUrl.map((image, index) => (
                   <img
                     key={`${image}-${index}`}
                     src={image}
