@@ -8,7 +8,7 @@ export default function Sidebar() {
     <aside className='border-grid fixed  z-30 hidden h-[calc(100vh-3.5rem)] w-1/6  shrink-0 border-r md:sticky md:block '>
       <div className='no-scrollbar h-full overflow-auto mt-3  px-4 py-4'>
         <div className='flex flex-col'>
-          <Button onClick={() => navigate("/createPost")}> new + </Button>
+          <Button onClick={() => navigate("/submit")}> new + </Button>
           <div className='grid grid-flow-row auto-rows-max gap-0.5 text- mt-2'>
             <Link
               to='/'
