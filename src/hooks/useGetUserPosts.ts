@@ -4,6 +4,7 @@ import { z, ZodError } from "zod";
 import { formatTimestamp } from "../lib/utils";
 import { toast } from "react-toastify";
 import { PostgrestError } from "@supabase/supabase-js";
+import { PostType } from "../lib/types";
 
 const PostSchema = z.object({
   id: z.string(),
@@ -27,31 +28,14 @@ const PostSchema = z.object({
 
 type PostDBType = z.infer<typeof PostSchema>;
 
-type PostType = {
-  id: string;
-  createdAt: string;
-  updatedAt: string | null;
-  createdById: string | null;
-  updatedById: string | null;
-  title: string | null;
-  description: string | null;
-  badges: string[];
-  mediaSource: string[];
-  mediaSize: number;
-  mediaName: string;
-  mediaType: string;
-  mediaUrl: string[];
-  profile: {
-    id: string;
-    avatarURL: string;
-    name: string;
-  };
-};
-
-async function fetchPosts(): Promise<PostDBType[] | undefined> {
+async function fetchUserPosts(
+  userID: string
+): Promise<PostDBType[] | undefined> {
   try {
-    const { data } = await supabase.from("content").select(
-      `
+    const { data } = await supabase
+      .from("content")
+      .select(
+        `
             id,
             created_at,
             updated_at,
@@ -70,7 +54,8 @@ async function fetchPosts(): Promise<PostDBType[] | undefined> {
                 avatar_url
             )
         `
-    );
+      )
+      .eq("created_by_id", userID);
 
     if (data) {
       return data.map((datum) => PostSchema.parse(datum));
@@ -95,11 +80,15 @@ async function fetchPosts(): Promise<PostDBType[] | undefined> {
   }
 }
 
-export default function useGetPosts() {
+type Params = {
+  userID: string;
+};
+
+export default function useGetUserPosts(params: Params) {
   return useQuery<PostType[], Error>({
-    queryKey: ["posts"],
+    queryKey: ["user-posts", params],
     queryFn: async () => {
-      const data = await fetchPosts();
+      const data = await fetchUserPosts(params.userID);
 
       const posts = (data ?? []).map((datum) => ({
         id: datum.id,
@@ -148,5 +137,6 @@ export default function useGetPosts() {
 
       return postsWithMedia;
     },
+    enabled: params.userID.length > 0,
   });
 }
