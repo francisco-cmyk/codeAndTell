@@ -29,10 +29,10 @@ type ProviderPops = {
   children: ReactNode;
 };
 
-const initialUser = {
+const initialUser: User = {
   id: "",
-  name: "",
-  avatarUrl: "",
+  name: "NPC",
+  avatarUrl: "public/anon-user.png",
   email: "",
 };
 
@@ -55,10 +55,11 @@ export const AuthenticationProvider: React.FC<ProviderPops> = ({
 
     if (userData && session) {
       setIsAuthenticated(true);
+
       setUser({
         id: userData.id,
-        name: userData.full_name,
-        avatarUrl: userData.avatar_url,
+        name: userData.full_name ?? initialUser.name,
+        avatarUrl: userData.avatar_url ?? "public/profile-boy-icon.png",
         email: userData.email,
       });
     }
@@ -70,6 +71,7 @@ export const AuthenticationProvider: React.FC<ProviderPops> = ({
         // handle initial session
       } else if (event === "SIGNED_IN") {
         // handle sign in event
+        refetchSession();
       } else if (event === "SIGNED_OUT") {
         refetchSession();
       } else if (event === "PASSWORD_RECOVERY") {

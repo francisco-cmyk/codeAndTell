@@ -22,20 +22,12 @@ export default function UserProfile(props: UserprofileProps) {
     props.setLoginOpen();
   }
 
-  const name = user.name ? user.name : "NPC";
-  const avatar =
-    isAuthenticated && user.avatarUrl
-      ? user.avatarUrl
-      : isAuthenticated && !user.avatarUrl
-      ? "public/profile-boy-icon.png"
-      : "public/anon-user.png";
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className={`flex mr-2`}>
         <Avatar className='h-7 w-7 dark:bg-slate-300'>
-          <AvatarImage className='border-2' src={avatar} />
-          <AvatarFallback>{name.slice(0, 2)}</AvatarFallback>
+          <AvatarImage className='border-2' src={user.avatarUrl} />
+          <AvatarFallback>{user.name.slice(0, 2)}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
@@ -46,13 +38,11 @@ export default function UserProfile(props: UserprofileProps) {
         <DropdownMenuSeparator />
         <DropdownMenuItem>notifications</DropdownMenuItem>
         <DropdownMenuItem>settings</DropdownMenuItem>
-        {isAuthenticated ? (
-          <DropdownMenuItem onClick={() => useSignoutFn()}>
-            logout
-          </DropdownMenuItem>
-        ) : (
-          <DropdownMenuItem onClick={handleSignIn}>sign in</DropdownMenuItem>
-        )}
+        <DropdownMenuItem
+          onClick={() => (isAuthenticated ? useSignoutFn() : handleSignIn())}
+        >
+          {isAuthenticated ? "logout" : "sign in "}
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
