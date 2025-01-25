@@ -19,6 +19,8 @@ type User = {
 type AuthContextType = {
   isAuthenticated: boolean;
   user: User;
+  isLoginOpen: boolean;
+  setIsLoginOpen: (val: boolean) => void;
 };
 
 const AuthContextProvider = createContext<AuthContextType | undefined>(
@@ -41,6 +43,7 @@ export const AuthenticationProvider: React.FC<ProviderPops> = ({
 }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<User>(initialUser);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
 
   const { data: session, refetch: refetchSession } = useGetSession();
   const sessionID = session ? session.user.id : "";
@@ -88,8 +91,14 @@ export const AuthenticationProvider: React.FC<ProviderPops> = ({
     };
   }, []);
 
+  // function handleLoginOpen(val?: boolean) {
+  //   setIsLoginOpen(val ?? !isLoginOpen);
+  // }
+
   return (
-    <AuthContextProvider.Provider value={{ isAuthenticated, user }}>
+    <AuthContextProvider.Provider
+      value={{ isAuthenticated, user, isLoginOpen, setIsLoginOpen }}
+    >
       {children}
     </AuthContextProvider.Provider>
   );

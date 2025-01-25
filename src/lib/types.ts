@@ -18,3 +18,9 @@ export type PostType = {
     name: string;
   };
 };
+
+export type Tags = {
+  value: string;
+  label: string;
+  icon: React.FC<React.SVGProps<SVGSVGElement>>;
+};
