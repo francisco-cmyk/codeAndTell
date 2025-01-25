@@ -28,6 +28,16 @@ type FeedProps = {
 export default function Feed(props: FeedProps) {
   const placeholders = Array.from(Array(3).keys());
 
+  if (props.posts.length === 0) {
+    return (
+      <div className='w-full h-[300px] flex justify-center items-center mt-10'>
+        <p className='text-[40px] font-semibold text-slate-500 text-opacity-55'>
+          no posts
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div
       className={`w-full h-screen grid grid-cols-1 gap-y-12 p-5 pb-44 place-self-center overflow-y-auto no-scrollbar`}
@@ -68,19 +78,19 @@ export default function Feed(props: FeedProps) {
               <CardContent
                 className={`${
                   post.mediaSource.length > 0 ? `h-96` : `hidden`
-                } mx-6 mb-6 p-4 overflow-y-scroll no-scrollbar flex justify-center border-black `}
+                } mx-6 mb-6 p-4 overflow-y-auto  no-scrollbar flex justify-center border-black `}
               >
-                <Carousel className='h-full w-5/6'>
+                <Carousel className='w-5/6'>
                   <CarouselContent>
                     {post.mediaUrl.map((image, index) => (
                       <CarouselItem
                         key={`${image}-${index}`}
                         className={
-                          post.mediaSource.length > 1 ? "basis-2/3" : ""
+                          post.mediaSource.length > 1 ? "basis-5/6" : ""
                         }
                       >
-                        <AspectRatio ratio={8 / 9}>
-                          <img src={image} className='w-full h-full ' />
+                        <AspectRatio ratio={4 / 5}>
+                          <img src={image} />
                         </AspectRatio>
                       </CarouselItem>
                     ))}

@@ -3,10 +3,10 @@ import "../index.css";
 import Nav from "../components/custom-ui/Nav";
 import Sidebar from "../components/custom-ui/Sidebar";
 import LoginModal from "../components/custom-ui/LoginModal";
-import { useState } from "react";
+import { useAuthContext } from "../context/auth";
 
 export default function Layout() {
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const { isLoginOpen, setIsLoginOpen } = useAuthContext();
 
   function handleLoginOpen() {
     setIsLoginOpen(!isLoginOpen);
