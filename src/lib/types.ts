@@ -17,6 +17,13 @@ export type PostType = {
     avatarURL: string;
     name: string;
   };
+  comments: {
+    id: number;
+    userID: string;
+    content: string;
+    parentCommentID: string | null;
+    createdAt: string | null;
+  }[];
 };
 
 export type Tags = {

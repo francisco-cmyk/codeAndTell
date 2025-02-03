@@ -19,16 +19,18 @@ import {
   CarouselPrevious,
 } from "../ui-lib/Carousel";
 import { Skeleton } from "../ui-lib/Skeleton";
+import { MessageCircle } from "lucide-react";
 
 type FeedProps = {
   isLoading: boolean;
   posts: PostType[];
+  onSelect?: (postID: string) => void;
 };
 
 export default function Feed(props: FeedProps) {
   const placeholders = Array.from(Array(3).keys());
 
-  if (props.posts.length === 0) {
+  if (props.posts.length === 0 && !props.isLoading) {
     return (
       <div className='w-full h-[300px] flex justify-center items-center mt-10'>
         <p className='text-[40px] font-semibold text-slate-500 text-opacity-55'>
@@ -103,16 +105,28 @@ export default function Feed(props: FeedProps) {
                   )}
                 </Carousel>
               </CardContent>
-              <CardFooter>
-                {post.badges.map((badge, index) => (
-                  <Badge
-                    key={`${badge}-${index}`}
-                    variant={"outline"}
-                    className={`mr-2 dark:text-white dark:border-slate-50`}
-                  >
-                    {badge}
-                  </Badge>
-                ))}
+              <CardFooter className='w-full flex justify-between'>
+                <div className='flex max-w-2/4'>
+                  {post.badges.map((badge, index) => (
+                    <Badge
+                      key={`${badge}-${index}`}
+                      variant={"outline"}
+                      className={`mr-2 dark:text-white dark:border-slate-50`}
+                    >
+                      {badge}
+                    </Badge>
+                  ))}
+                </div>
+
+                <div
+                  className='flex rounded-md p-2 hover:bg-zinc-100 dark:hover:bg-zinc-600'
+                  onClick={() => props.onSelect && props.onSelect(post.id)}
+                >
+                  <MessageCircle className='h-5 w-5 text-zinc-400' />
+                  <p className='text-sm font-semibold text-foreground'>
+                    {post.comments.length}
+                  </p>
+                </div>
               </CardFooter>
             </Card>
           ))}

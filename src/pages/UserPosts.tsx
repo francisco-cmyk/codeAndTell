@@ -5,7 +5,6 @@ import {
 } from "../components/ui-lib/Avatar";
 import { useAuthContext } from "../context/auth";
 import useGetUserPosts from "../hooks/useGetUserPosts";
-// import { keyBy } from "lodash";
 import { useEffect, useState } from "react";
 import getMergeState from "../lib/utils";
 import Feed from "../components/custom-ui/Feed";
@@ -52,11 +51,11 @@ export default function UserPosts() {
 
     if (isAuthenticated) return;
 
-    const hasModalBeenShown = localStorage.getItem("hasModalBeenShown");
+    const hasModalBeenShown = sessionStorage.getItem("hasModalBeenShown");
 
     if (!hasModalBeenShown) {
       setIsLoginOpen(true);
-      localStorage.setItem("hasModalBeenShown", "true");
+      sessionStorage.setItem("hasModalBeenShown", "true");
     }
   }, [isAuthenticated]);
 
@@ -117,7 +116,7 @@ export default function UserPosts() {
         {tabs.map((tab, index) => (
           <div
             key={`${tab.label}-${index}`}
-            className={`group flex h-8 w-full items-center justify-start rounded-lg px-2 font-normal text-foreground underline-offset-2 hover:bg-slate-200 dark:hover:bg-accent hover:text-accent-foreground ${
+            className={`group flex h-8 w-full items-center justify-start rounded-lg px-2 font-normal text-foreground underline-offset-2 hover:bg-slate-200 dark:hover:bg-accent hover:text-accent-foreground mb-1 ${
               state.viewTab === tab.value
                 ? "bg-slate-200 hover:bg-slate-300 dark:bg-accent"
                 : ""
