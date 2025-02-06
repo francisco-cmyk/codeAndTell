@@ -1,6 +1,8 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { formatDistanceToNow } from "date-fns";
+import { Tags } from "./types";
+import { Cat, Dog, Fish, Rabbit, Turtle } from "lucide-react";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -30,3 +32,11 @@ export function createAcronym(name: string, length = 2) {
 
   return acronym.slice(0, length);
 }
+
+export const tagList: Tags[] = [
+  { value: "discrod", label: "discrod", icon: Turtle },
+  { value: "torture", label: "torture", icon: Cat },
+  { value: "fun", label: "fun", icon: Dog },
+  { value: "easy", label: "easy", icon: Rabbit },
+  { value: "dev hell", label: "dev hell", icon: Fish },
+];
