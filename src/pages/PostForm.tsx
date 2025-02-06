@@ -14,15 +14,17 @@ import {
 import { Input } from "../components/ui-lib/Input";
 import { Textarea } from "../components/ui-lib/TextArea";
 import { MultiSelect } from "../components/ui-lib/MultiSelect";
-import { useState } from "react";
-import { Cat, Dog, Fish, Rabbit, Turtle } from "lucide-react";
 
 const tagList = [
-  { value: "discrod", label: "discrod", icon: Turtle },
-  { value: "torture", label: "torture", icon: Cat },
-  { value: "fun", label: "fun", icon: Dog },
-  { value: "easy", label: "easy", icon: Rabbit },
-  { value: "dev hell", label: "dev hell", icon: Fish },
+  { value: "discord", label: "discord" },
+  { value: "slack", label: "slack" },
+  { value: "1-2 Devs", label: "1-2 Devs" },
+  { value: "2-3 Devs", label: "2-3 Devs" },
+  { value: "3-4 Devs", label: "3-4 Devs" },
+  { value: "4+ Devs", label: "4+ Devs" },
+  { value: "easy", label: "easy" },
+  { value: "medium", label: "medium" },
+  { value: "hard", label: "hard" },
 ];
 
 
