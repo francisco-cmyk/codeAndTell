@@ -17,4 +17,17 @@ export type PostType = {
     avatarURL: string;
     name: string;
   };
+  comments: {
+    id: number;
+    userID: string;
+    content: string;
+    parentCommentID: string | null;
+    createdAt: string | null;
+  }[];
+};
+
+export type Tags = {
+  value: string;
+  label: string;
+  icon: React.FC<React.SVGProps<SVGSVGElement>>;
 };

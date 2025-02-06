@@ -4,6 +4,7 @@ import { z, ZodError } from "zod";
 import { formatTimestamp } from "../lib/utils";
 import { toast } from "react-toastify";
 import { PostgrestError } from "@supabase/supabase-js";
+import { PostType } from "../lib/types";
 
 const PostSchema = z.object({
   id: z.string(),
@@ -23,30 +24,18 @@ const PostSchema = z.object({
     avatar_url: z.string(),
     full_name: z.string(),
   }),
+  comments: z.array(
+    z.object({
+      content: z.string(),
+      created_at: z.nullable(z.string()),
+      id: z.number(),
+      parent_comment_id: z.nullable(z.string()),
+      user_id: z.string(),
+    })
+  ),
 });
 
 type PostDBType = z.infer<typeof PostSchema>;
-
-type PostType = {
-  id: string;
-  createdAt: string;
-  updatedAt: string | null;
-  createdById: string | null;
-  updatedById: string | null;
-  title: string | null;
-  description: string | null;
-  badges: string[];
-  mediaSource: string[];
-  mediaSize: number;
-  mediaName: string;
-  mediaType: string;
-  mediaUrl: string[];
-  profile: {
-    id: string;
-    avatarURL: string;
-    name: string;
-  };
-};
 
 async function fetchPosts(): Promise<PostDBType[] | undefined> {
   try {
@@ -68,6 +57,13 @@ async function fetchPosts(): Promise<PostDBType[] | undefined> {
                 id,
                 full_name,
                 avatar_url
+            ),
+            comments (
+              id,
+              content,
+              created_at,
+              user_id,
+              parent_comment_id
             )
         `
     );
@@ -120,6 +116,13 @@ export default function useGetPosts() {
           avatarURL: datum.profiles.avatar_url,
           name: datum.profiles.full_name,
         },
+        comments: datum.comments.map((comment) => ({
+          id: comment.id,
+          userID: comment.user_id,
+          parentCommentID: comment.parent_comment_id,
+          content: comment.content,
+          createdAt: comment.created_at,
+        })),
       }));
 
       const postsWithMedia = await Promise.all(

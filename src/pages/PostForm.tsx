@@ -9,7 +9,6 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
 } from "../components/ui-lib/Form";
 import { Input } from "../components/ui-lib/Input";
 import { Textarea } from "../components/ui-lib/TextArea";
@@ -27,7 +26,6 @@ const tagList = [
   { value: "hard", label: "hard" },
 ];
 
-
 export default function PostForm() {
   const formSchema = z.object({
     title: z.string().min(2).max(50),
@@ -42,33 +40,33 @@ export default function PostForm() {
       title: "",
       outburst: "",
       body: "",
-      tags: []
-    }
+      tags: [],
+    },
   });
 
   function createPost(values: z.infer<typeof formSchema>) {
-    console.log(values)
+    console.log(values);
   }
 
   return (
     <div className='flex-grow h-screen flex flex-col justify-center items-center'>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(createPost)} className="space-y-4">
+        <form onSubmit={form.handleSubmit(createPost)} className='space-y-4'>
           <FormField
             control={form.control}
-            name="title"
+            name='title'
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Title</FormLabel>
                 <FormControl>
-                  <Input placeholder="title" {...field} />
+                  <Input placeholder='title' {...field} />
                 </FormControl>
               </FormItem>
             )}
           />
           <FormField
             control={form.control}
-            name="outburst"
+            name='outburst'
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Outburst</FormLabel>
@@ -76,43 +74,46 @@ export default function PostForm() {
                   Write a short eye-catching description of your project.
                 </FormDescription>
                 <FormControl>
-                  <Input placeholder="outburst" {...field} />
+                  <Input placeholder='outburst' {...field} />
                 </FormControl>
               </FormItem>
             )}
           />
           <FormField
             control={form.control}
-            name="body"
+            name='body'
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Body</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="tell us kind of a long story about your project..." {...field} />
+                  <Textarea
+                    placeholder='tell us kind of a long story about your project...'
+                    {...field}
+                  />
                 </FormControl>
               </FormItem>
             )}
           />
           <FormField
             control={form.control}
-            name="tags"
+            name='tags'
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Tags</FormLabel>
                 <MultiSelect
                   options={tagList}
                   onValueChange={(value) => {
-                    form.setValue("tags", value)
+                    form.setValue("tags", value);
                   }}
-                  placeholder="Select tags"
-                  variant="inverted"
+                  placeholder='Select tags'
+                  variant='inverted'
                   animation={2}
                   maxCount={3}
                 />
               </FormItem>
             )}
           />
-          <Button type="submit">Submit</Button>
+          <Button type='submit'>Submit</Button>
         </form>
       </Form>
     </div>

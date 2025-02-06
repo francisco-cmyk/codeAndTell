@@ -24,6 +24,15 @@ const PostSchema = z.object({
     avatar_url: z.string(),
     full_name: z.string(),
   }),
+  comments: z.array(
+    z.object({
+      content: z.string(),
+      created_at: z.nullable(z.string()),
+      id: z.number(),
+      parent_comment_id: z.nullable(z.string()),
+      user_id: z.string(),
+    })
+  ),
 });
 
 type PostDBType = z.infer<typeof PostSchema>;
@@ -52,6 +61,13 @@ async function fetchUserPosts(
                 id,
                 full_name,
                 avatar_url
+            ),
+            comments (
+              id,
+              content,
+              created_at,
+              user_id,
+              parent_comment_id
             )
         `
       )
@@ -109,6 +125,13 @@ export default function useGetUserPosts(params: Params) {
           avatarURL: datum.profiles.avatar_url,
           name: datum.profiles.full_name,
         },
+        comments: datum.comments.map((comment) => ({
+          id: comment.id,
+          userID: comment.user_id,
+          parentCommentID: comment.parent_comment_id,
+          content: comment.content,
+          createdAt: comment.created_at,
+        })),
       }));
 
       const postsWithMedia = await Promise.all(
