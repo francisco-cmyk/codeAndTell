@@ -23,11 +23,10 @@ export default function useNewPost() {
       ]);
     },
     onError: (error) => {
-      if (error) {
-        toast.error(`Error submitting your post:, ${error.message}`, {
-          toastId: "newPostError",
-        });
-      }
+      console.warn("error", error);
+      toast.error(`Error submitting your post:, ${error.message}`, {
+        toastId: "newPostError",
+      });
     },
     onSuccess: () => {},
   });

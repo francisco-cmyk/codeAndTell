@@ -30,8 +30,6 @@ const tagList = [
   { value: "hard", label: "hard" },
 ];
 
-
-
 export default function PostForm() {
   const formSchema = z.object({
     title: z.string().min(2).max(50),
@@ -58,7 +56,6 @@ export default function PostForm() {
       toast.error(`Error submitting your post:, Please include a title.`, {
         toastId: "newPostError",
       });
-
     }
 
     newPost(
@@ -66,20 +63,26 @@ export default function PostForm() {
         userID: user.id,
         title: values.title,
         description: values.description,
-        badges: values.badges
+        badges: values.badges,
       },
       {
         onSuccess: () => {
-          navigate('/');
+          navigate("/");
+        },
+        onError: (error) => {
+          console.log(error);
         },
       }
-    )
+    );
   }
 
   return (
     <div className='flex-grow h-screen flex flex-col justify-center items-center'>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(createPost)} className='w-2/4 space-y-4'>
+        <form
+          onSubmit={form.handleSubmit(createPost)}
+          className='w-2/4 space-y-4'
+        >
           <FormField
             control={form.control}
             name='title'
@@ -98,15 +101,9 @@ export default function PostForm() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Description</FormLabel>
-                <FormDescription>
-                  Tell us all about this thing.
-                </FormDescription>
+                <FormDescription>Tell us all about this thing.</FormDescription>
                 <FormControl>
-                  <Textarea
-                    className="resize-none"
-                    placeholder=''
-                    {...field}
-                  />
+                  <Textarea className='resize-none' placeholder='' {...field} />
                 </FormControl>
               </FormItem>
             )}
