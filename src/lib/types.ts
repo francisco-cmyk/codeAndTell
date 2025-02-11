@@ -23,6 +23,11 @@ export type PostType = {
     content: string;
     parentCommentID: string | null;
     createdAt: string | null;
+    profile: {
+      id: string;
+      avatarURL: string;
+      name: string;
+    };
   }[];
 };
 

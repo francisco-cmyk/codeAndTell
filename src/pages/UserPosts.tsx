@@ -45,15 +45,14 @@ export default function UserPosts() {
   });
 
   useEffect(() => {
-    toast.info("Please sign in to see your posts", {
-      toastId: "signInInfo",
-    });
-
     if (isAuthenticated) return;
 
     const hasModalBeenShown = sessionStorage.getItem("hasModalBeenShown");
 
     if (!hasModalBeenShown) {
+      toast.info("Please sign in to see your posts", {
+        toastId: "signInInfo",
+      });
       setIsLoginOpen(true);
       sessionStorage.setItem("hasModalBeenShown", "true");
     }
