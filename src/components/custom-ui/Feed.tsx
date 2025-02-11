@@ -66,7 +66,7 @@ export default function Feed(props: FeedProps) {
         : props.posts.map((post, index) => (
             <Card
               key={`${post.title}-${index}`}
-              className={`place-self-center hover:bg-zinc-50 dark:bg-zinc-900 hover:dark:bg-zinc-800`}
+              className={`min-w-full place-self-center hover:bg-zinc-50 dark:bg-zinc-900 hover:dark:bg-zinc-800`}
               onClick={() => handleSelectPost(post.id)}
             >
               <CardHeader>

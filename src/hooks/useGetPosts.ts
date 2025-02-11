@@ -87,7 +87,7 @@ async function fetchPosts(): Promise<PostDBType[] | undefined> {
     if (data) {
       return data.map((datum) => PostSchema.parse(datum));
     } else {
-      [];
+      return [];
     }
   } catch (error) {
     if (error instanceof ZodError) {

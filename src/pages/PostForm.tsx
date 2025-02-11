@@ -13,43 +13,76 @@ import {
 import { Input } from "../components/ui-lib/Input";
 import { Textarea } from "../components/ui-lib/TextArea";
 import { MultiSelect } from "../components/ui-lib/MultiSelect";
-import { Cat, Dog, Fish, Rabbit, Turtle } from "lucide-react";
-import { Tags } from "../lib/types";
+import { useAuthContext } from "../context/auth";
+import { useNavigate } from "react-router-dom";
+import useNewPost from "../hooks/useNewPost";
+import { toast } from "react-toastify";
 
-const tagList: Tags[] = [
-  { value: "discrod", label: "discrod", icon: Turtle },
-  { value: "torture", label: "torture", icon: Cat },
-  { value: "fun", label: "fun", icon: Dog },
-  { value: "easy", label: "easy", icon: Rabbit },
-  { value: "dev hell", label: "dev hell", icon: Fish },
+const tagList = [
+  { value: "discord", label: "discord" },
+  { value: "slack", label: "slack" },
+  { value: "1-2 Devs", label: "1-2 Devs" },
+  { value: "2-3 Devs", label: "2-3 Devs" },
+  { value: "3-4 Devs", label: "3-4 Devs" },
+  { value: "4+ Devs", label: "4+ Devs" },
+  { value: "easy", label: "easy" },
+  { value: "medium", label: "medium" },
+  { value: "hard", label: "hard" },
 ];
 
 export default function PostForm() {
   const formSchema = z.object({
     title: z.string().min(2).max(50),
-    outburst: z.string().min(2).max(50),
-    body: z.string().min(2).max(50),
-    tags: z.string().array().min(1).max(3),
+    description: z.string().min(2).max(300),
+    badges: z.string().array().min(1).max(3),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
-      outburst: "",
-      body: "",
-      tags: [],
+      description: "",
+      badges: [],
     },
   });
 
+  const navigate = useNavigate();
+
+  const { user, isAuthenticated } = useAuthContext();
+  const { mutate: newPost } = useNewPost();
+
   function createPost(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    if (!values.title) {
+      toast.error(`Error submitting your post:, Please include a title.`, {
+        toastId: "newPostError",
+      });
+    }
+
+    newPost(
+      {
+        userID: user.id,
+        title: values.title,
+        description: values.description,
+        badges: values.badges,
+      },
+      {
+        onSuccess: () => {
+          navigate("/");
+        },
+        onError: (error) => {
+          console.log(error);
+        },
+      }
+    );
   }
 
   return (
     <div className='flex-grow h-screen flex flex-col justify-center items-center'>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(createPost)} className='space-y-4'>
+        <form
+          onSubmit={form.handleSubmit(createPost)}
+          className='w-2/4 space-y-4'
+        >
           <FormField
             control={form.control}
             name='title'
@@ -57,53 +90,36 @@ export default function PostForm() {
               <FormItem>
                 <FormLabel>Title</FormLabel>
                 <FormControl>
-                  <Input placeholder='title' {...field} />
+                  <Input placeholder='' {...field} />
                 </FormControl>
               </FormItem>
             )}
           />
           <FormField
             control={form.control}
-            name='outburst'
+            name='description'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Outburst</FormLabel>
-                <FormDescription>
-                  Write a short eye-catching description of your project.
-                </FormDescription>
+                <FormLabel>Description</FormLabel>
+                <FormDescription>Tell us all about this thing.</FormDescription>
                 <FormControl>
-                  <Input placeholder='outburst' {...field} />
+                  <Textarea className='resize-none' placeholder='' {...field} />
                 </FormControl>
               </FormItem>
             )}
           />
           <FormField
             control={form.control}
-            name='body'
+            name='badges'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Body</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder='tell us kind of a long story about your project...'
-                    {...field}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name='tags'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Tags</FormLabel>
+                <FormLabel>Badges</FormLabel>
                 <MultiSelect
                   options={tagList}
                   onValueChange={(value) => {
-                    form.setValue("tags", value);
+                    form.setValue("badges", value);
                   }}
-                  placeholder='Select tags'
+                  placeholder='Select badges'
                   variant='inverted'
                   animation={2}
                   maxCount={3}

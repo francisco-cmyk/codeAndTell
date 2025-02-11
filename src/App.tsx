@@ -30,7 +30,7 @@ function App() {
           autoClose={5000}
           toastClassName={(context) =>
             contextClass[context?.type || "default"] +
-            " relative flex min-h-10 p-6 rounded-md justify-between overflow-hidden cursor-pointer"
+            "relative flex min-h-10 p-6 rounded-md justify-between overflow-hidden cursor-pointer"
           }
           hideProgressBar={false}
           newestOnTop={false}
@@ -42,7 +42,7 @@ function App() {
           <Routes>
             <Route path='/' element={<Layout />}>
               <Route index element={<AllPosts />} />
-              <Route path='/submit' element={<PostForm />} />
+              <Route path='/newPost' element={<PostForm />} />
               <Route path='/ask4help' element={<HelpPage />} />
               <Route path='/myPosts' element={<UserPosts />} />
             </Route>
