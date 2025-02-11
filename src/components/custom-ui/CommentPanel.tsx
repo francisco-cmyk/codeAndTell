@@ -53,14 +53,16 @@ export default function Comments(props: PostViewProps) {
 
   return (
     <div
-      className={`relative max-w-md h-[calc(100vh-70px)] overflow-y-auto shadow-lg bg-slate-50 dark:bg-zinc-900  transition-transform duration-300 ease-in-out p-3 pb-12 no-scrollbar
+      className={`relative min-w-[400px] max-w-md h-[calc(100vh-70px)] overflow-y-auto shadow-lg bg-slate-50 dark:bg-zinc-900  transition-transform duration-300 ease-in-out p-3 pb-12 no-scrollbar
       ${props.isOpen ? "translate-x-0 " : "translate-x-full "}`}
     >
       <div className='h-full p-4 text-lg flex flex-col justify-between'>
         <div className='flex flex-col'>
           <div className='w-full flex flex-col '>
             <p className='font-semibold text-xl'>{props.post.title}</p>
-            <p className='text-sm mt-1'>{props.post.description}</p>
+            <p className='text-sm mt-1 overflow-hidden text-ellipsis'>
+              {props.post.description}
+            </p>
             <span className='text-xs text-right font-semibold'>{`by ${props.post.profile.name}`}</span>
             <Separator className='mb-5 mt-2' />
           </div>

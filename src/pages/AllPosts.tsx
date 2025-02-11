@@ -34,11 +34,7 @@ export default function AllPosts() {
   }
 
   function handleSelectedCommentPostID(id: string): void {
-    if (!state.selectedCommentPostID) {
-      mergeState({ selectedCommentPostID: id });
-      return;
-    }
-    mergeState({ selectedCommentPostID: "" });
+    mergeState({ selectedCommentPostID: id });
   }
 
   function handleCommentsClose() {

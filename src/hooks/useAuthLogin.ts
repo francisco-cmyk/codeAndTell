@@ -7,9 +7,12 @@ export default function useAuthLogin() {
   return useMutation({
     mutationKey: ["authLogin"],
     mutationFn: async (provider: Provider) => {
-      await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: provider, // Example: 'google', 'github', etc
       });
+      if (error) {
+        throw new Error(error.message);
+      }
     },
     onError: (error) => {
       if (error) {
