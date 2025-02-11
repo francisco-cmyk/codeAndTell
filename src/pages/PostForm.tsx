@@ -59,7 +59,7 @@ export default function PostForm() {
               <FormItem>
                 <FormLabel>Title</FormLabel>
                 <FormControl>
-                  <Input placeholder='title' {...field} />
+                  <Input placeholder='' {...field} />
                 </FormControl>
               </FormItem>
             )}
@@ -74,7 +74,7 @@ export default function PostForm() {
                   Write a short eye-catching description of your project.
                 </FormDescription>
                 <FormControl>
-                  <Input placeholder='outburst' {...field} />
+                  <Input placeholder='' {...field} />
                 </FormControl>
               </FormItem>
             )}
@@ -85,9 +85,12 @@ export default function PostForm() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Body</FormLabel>
+                <FormDescription>
+                  Tell us all about this thing.
+                </FormDescription>
                 <FormControl>
                   <Textarea
-                    placeholder='tell us kind of a long story about your project...'
+                    placeholder=''
                     {...field}
                   />
                 </FormControl>

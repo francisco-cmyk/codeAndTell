@@ -27,11 +27,11 @@ export default function AllPosts() {
 
   return (
     <div className='w-full h-screen '>
-      {/* <Feed
+      <Feed
         isLoading={isLoadingPosts}
         posts={posts}
         onSelect={handleSelectPost}
-      /> */}
+      />
       <SinglePostView post={selectedPost} />
     </div>
   );
