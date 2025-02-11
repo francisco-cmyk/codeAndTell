@@ -1,0 +1,117 @@
+import { useState } from "react";
+import { PostType } from "../../lib/types";
+import { Separator } from "../ui-lib/Separator";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui-lib/Avatar";
+import { createAcronym } from "../../lib/utils";
+import { Textarea } from "../ui-lib/TextArea";
+import { useQueryClient } from "@tanstack/react-query";
+import { Button } from "../ui-lib/Button";
+import { useAuthContext } from "../../context/auth";
+import { toast } from "react-toastify";
+import usePostComment from "../../hooks/usePostComment";
+
+type PostViewProps = {
+  post: PostType;
+  isOpen: boolean;
+  onClose: () => void;
+};
+
+export default function Comments(props: PostViewProps) {
+  const { isAuthenticated, user } = useAuthContext();
+  const queryClient = useQueryClient();
+
+  const [comment, setComment] = useState("");
+
+  const { mutate: postComment } = usePostComment();
+
+  function handleSubmitComment() {
+    if (!comment.trim()) {
+      toast.error(`Cannot submit empty comments, please add text.`, {
+        toastId: "emptyCommentError",
+      });
+      return;
+    }
+
+    postComment(
+      {
+        userID: user.id,
+        content: comment,
+        postID: props.post.id,
+      },
+      {
+        onSuccess: () => {
+          setComment("");
+          queryClient.invalidateQueries({ queryKey: ["posts"] });
+        },
+      }
+    );
+  }
+
+  if (!props.post) {
+    return null;
+  }
+
+  return (
+    <div
+      className={`relative max-w-md h-[calc(100vh-70px)] overflow-y-auto shadow-lg bg-slate-50 dark:bg-zinc-900  transition-transform duration-300 ease-in-out p-3 pb-12 no-scrollbar
+      ${props.isOpen ? "translate-x-0 " : "translate-x-full "}`}
+    >
+      <div className='h-full p-4 text-lg flex flex-col justify-between'>
+        <div className='flex flex-col'>
+          <div className='w-full flex flex-col '>
+            <p className='font-semibold text-xl'>{props.post.title}</p>
+            <p className='text-sm mt-1'>{props.post.description}</p>
+            <span className='text-xs text-right font-semibold'>{`by ${props.post.profile.name}`}</span>
+            <Separator className='mb-5 mt-2' />
+          </div>
+
+          <div className='min-h-80 max-h-96 overflow-y-auto p-3 space-y-4 '>
+            {props.post && props.post.comments
+              ? props.post.comments.map((comment, index) => (
+                  <div
+                    key={`${comment.userID}-${index}`}
+                    className='flex flex-col text-sm mb-5'
+                  >
+                    <div className='w-full flex mb-1'>
+                      <Avatar className='h-5 w-5 mr-2'>
+                        <AvatarImage
+                          src={comment.profile.avatarURL}
+                          alt='@profilePic'
+                        />
+                        <AvatarFallback>
+                          {createAcronym(comment.profile.name)}
+                        </AvatarFallback>
+                      </Avatar>
+
+                      <p className='text-xs mb-2'>{comment.profile.name}</p>
+                    </div>
+                    <p className='pl-2 pb-2'>{comment.content}</p>
+                    <span className='text-xs text-right'>
+                      {comment.createdAt}
+                    </span>
+                    <Separator className='mt-2 ' />
+                  </div>
+                ))
+              : null}
+          </div>
+        </div>
+
+        <div className='w-full p-4 '>
+          <Textarea
+            className='dark:bg-zinc-700 h-24'
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+          />
+          <div className='w-full flex justify-between mt-2'>
+            <Button variant='outline' onClick={props.onClose}>
+              close
+            </Button>
+            <Button disabled={!isAuthenticated} onClick={handleSubmitComment}>
+              send
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

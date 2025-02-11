@@ -13,6 +13,10 @@ import {
 import { Input } from "../components/ui-lib/Input";
 import { Textarea } from "../components/ui-lib/TextArea";
 import { MultiSelect } from "../components/ui-lib/MultiSelect";
+import { useAuthContext } from "../context/auth";
+import { useNavigate } from "react-router-dom";
+import useNewPost from "../hooks/useNewPost";
+import { toast } from "react-toastify";
 
 const tagList = [
   { value: "discord", label: "discord" },
@@ -26,32 +30,56 @@ const tagList = [
   { value: "hard", label: "hard" },
 ];
 
+
+
 export default function PostForm() {
   const formSchema = z.object({
     title: z.string().min(2).max(50),
-    outburst: z.string().min(2).max(50),
-    body: z.string().min(2).max(50),
-    tags: z.string().array().min(1).max(3),
+    description: z.string().min(2).max(300),
+    badges: z.string().array().min(1).max(3),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
-      outburst: "",
-      body: "",
-      tags: [],
+      description: "",
+      badges: [],
     },
   });
 
+  const navigate = useNavigate();
+
+  const { user, isAuthenticated } = useAuthContext();
+  const { mutate: newPost } = useNewPost();
+
   function createPost(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    if (!values.title) {
+      toast.error(`Error submitting your post:, Please include a title.`, {
+        toastId: "newPostError",
+      });
+
+    }
+
+    newPost(
+      {
+        userID: user.id,
+        title: values.title,
+        description: values.description,
+        badges: values.badges
+      },
+      {
+        onSuccess: () => {
+          navigate('/');
+        },
+      }
+    )
   }
 
   return (
     <div className='flex-grow h-screen flex flex-col justify-center items-center'>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(createPost)} className='space-y-4'>
+        <form onSubmit={form.handleSubmit(createPost)} className='w-2/4 space-y-4'>
           <FormField
             control={form.control}
             name='title'
@@ -66,30 +94,16 @@ export default function PostForm() {
           />
           <FormField
             control={form.control}
-            name='outburst'
+            name='description'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Outburst</FormLabel>
-                <FormDescription>
-                  Write a short eye-catching description of your project.
-                </FormDescription>
-                <FormControl>
-                  <Input placeholder='' {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name='body'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Body</FormLabel>
+                <FormLabel>Description</FormLabel>
                 <FormDescription>
                   Tell us all about this thing.
                 </FormDescription>
                 <FormControl>
                   <Textarea
+                    className="resize-none"
                     placeholder=''
                     {...field}
                   />
@@ -99,16 +113,16 @@ export default function PostForm() {
           />
           <FormField
             control={form.control}
-            name='tags'
+            name='badges'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Tags</FormLabel>
+                <FormLabel>Badges</FormLabel>
                 <MultiSelect
                   options={tagList}
                   onValueChange={(value) => {
-                    form.setValue("tags", value);
+                    form.setValue("badges", value);
                   }}
-                  placeholder='Select tags'
+                  placeholder='Select badges'
                   variant='inverted'
                   animation={2}
                   maxCount={3}

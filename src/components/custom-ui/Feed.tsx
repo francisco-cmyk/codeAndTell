@@ -1,6 +1,5 @@
 import { PostType } from "../../lib/types";
 import { createAcronym } from "../../lib/utils";
-import { AspectRatio } from "../ui-lib/AspectRatio";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui-lib/Avatar";
 import { Badge } from "../ui-lib/Badge";
 import {
@@ -25,6 +24,7 @@ type FeedProps = {
   isLoading: boolean;
   posts: PostType[];
   onSelect?: (postID: string) => void;
+  onCommentSelect?: (postID: string) => void;
 };
 
 export default function Feed(props: FeedProps) {
@@ -40,23 +40,36 @@ export default function Feed(props: FeedProps) {
     );
   }
 
+  function handleSelectPost(id: string) {
+    if (props.onSelect) {
+      props.onSelect(id);
+    }
+  }
+
+  function handleCommentSelect(id: string) {
+    if (props.onCommentSelect) {
+      props.onCommentSelect(id);
+    }
+  }
+
   return (
     <div
-      className={`w-full h-screen grid grid-cols-1 gap-y-12 p-5 pb-44 place-self-center overflow-y-auto no-scrollbar`}
+      className={`max-w-3xl h-full grid grid-cols-1 gap-y-12 p-3 pb-44 place-self-center overflow-y-auto no-scrollbar`}
     >
       {props.isLoading
         ? placeholders.map((_, index) => (
             <Skeleton
               key={index}
-              className={`w-3/5 min-h-[300px] place-self-center`}
+              className={`min-h-[300px] place-self-center`}
             />
           ))
         : props.posts.map((post, index) => (
             <Card
               key={`${post.title}-${index}`}
-              className={`w-3/5 h-content place-self-center dark:bg-zinc-900`}
+              className={`place-self-center hover:bg-zinc-50 dark:bg-zinc-900 hover:dark:bg-zinc-800`}
+              onClick={() => handleSelectPost(post.id)}
             >
-              <CardHeader className=''>
+              <CardHeader>
                 <CardTitle className={`text-2xl mb-1`}>{post.title}</CardTitle>
                 <CardDescription className='w-full flex justify-between text-xs '>
                   <div className='flex items-center'>
@@ -78,29 +91,30 @@ export default function Feed(props: FeedProps) {
                 </CardDescription>
               </CardHeader>
               <CardContent
-                className={`${
-                  post.mediaSource.length > 0 ? `h-96` : `hidden`
-                } mx-6 mb-6 p-4 overflow-y-auto  no-scrollbar flex justify-center border-black `}
+                className='relative w-full p-1 mx-auto overflow-hidden rounded-lg'
+                onClick={(e) => e.stopPropagation()}
               >
-                <Carousel className='w-5/6'>
+                <Carousel className='w-full mx-auto rounded-lg'>
                   <CarouselContent>
                     {post.mediaUrl.map((image, index) => (
                       <CarouselItem
                         key={`${image}-${index}`}
-                        className={
-                          post.mediaSource.length > 1 ? "basis-5/6" : ""
-                        }
+                        className='relative w-full flex justify-center items-center p-2 rounded-lg'
                       >
-                        <AspectRatio ratio={4 / 5}>
-                          <img src={image} />
-                        </AspectRatio>
+                        <BackgroundImage image={image} />
+                        <div className='relative w-full max-h-[500px] flex justify-center items-center overflow-hidden'>
+                          <img
+                            className=' max-h-[500px] object-contain rounded-lg'
+                            src={image}
+                          />
+                        </div>
                       </CarouselItem>
                     ))}
                   </CarouselContent>
                   {post.mediaSource.length > 1 && (
                     <>
-                      <CarouselPrevious />
-                      <CarouselNext />
+                      <CarouselPrevious className='left-1' />
+                      <CarouselNext className='right-1' />
                     </>
                   )}
                 </Carousel>
@@ -120,7 +134,10 @@ export default function Feed(props: FeedProps) {
 
                 <div
                   className='flex rounded-md p-2 hover:bg-zinc-100 dark:hover:bg-zinc-600'
-                  onClick={() => props.onSelect && props.onSelect(post.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleCommentSelect(post.id);
+                  }}
                 >
                   <MessageCircle className='h-5 w-5 text-zinc-400' />
                   <p className='text-sm font-semibold text-foreground'>
@@ -131,5 +148,14 @@ export default function Feed(props: FeedProps) {
             </Card>
           ))}
     </div>
+  );
+}
+
+function BackgroundImage(props: { image: string }) {
+  return (
+    <div
+      className='absolute inset-0 bg-center bg-cover blur-lg brightness-75'
+      style={{ backgroundImage: `url(${props.image})` }}
+    ></div>
   );
 }

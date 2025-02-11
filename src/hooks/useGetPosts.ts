@@ -6,6 +6,9 @@ import { toast } from "react-toastify";
 import { PostgrestError } from "@supabase/supabase-js";
 import { PostType } from "../lib/types";
 
+const defaultName = "Anon";
+const defaultAvatar = "public/anon-user.png";
+
 const PostSchema = z.object({
   id: z.string(),
   created_at: z.string(),
@@ -21,8 +24,8 @@ const PostSchema = z.object({
   media_type: z.nullable(z.string()),
   profiles: z.object({
     id: z.string(),
-    avatar_url: z.string(),
-    full_name: z.string(),
+    avatar_url: z.nullable(z.string()),
+    full_name: z.nullable(z.string()),
   }),
   comments: z.array(
     z.object({
@@ -31,6 +34,11 @@ const PostSchema = z.object({
       id: z.number(),
       parent_comment_id: z.nullable(z.string()),
       user_id: z.string(),
+      profiles: z.object({
+        id: z.string(),
+        avatar_url: z.nullable(z.string()),
+        full_name: z.nullable(z.string()),
+      }),
     })
   ),
 });
@@ -39,8 +47,10 @@ type PostDBType = z.infer<typeof PostSchema>;
 
 async function fetchPosts(): Promise<PostDBType[] | undefined> {
   try {
-    const { data } = await supabase.from("content").select(
-      `
+    const { data } = await supabase
+      .from("content")
+      .select(
+        `
             id,
             created_at,
             updated_at,
@@ -58,26 +68,34 @@ async function fetchPosts(): Promise<PostDBType[] | undefined> {
                 full_name,
                 avatar_url
             ),
-            comments (
+            comments!post_id (
               id,
               content,
               created_at,
               user_id,
-              parent_comment_id
+              parent_comment_id,
+              profiles!comments_user_id_fkey (
+                id,
+                full_name,
+                avatar_url
+              )
             )
         `
-    );
+      )
+      .order("created_at", { ascending: false });
 
     if (data) {
       return data.map((datum) => PostSchema.parse(datum));
     } else {
-      [];
+      return [];
     }
   } catch (error) {
     if (error instanceof ZodError) {
       const errorMessages = error.issues.map((issue) => {
         return `${issue.path.join(".")}: ${issue.message}`;
       });
+
+      console.warn("error", error);
 
       toast.error(`Error was an error retrieving posts:, ${errorMessages}`, {
         toastId: "fetchUserPostsError",
@@ -113,15 +131,20 @@ export default function useGetPosts() {
         mediaUrl: [],
         profile: {
           id: datum.profiles.id,
-          avatarURL: datum.profiles.avatar_url,
-          name: datum.profiles.full_name,
+          avatarURL: datum.profiles.avatar_url ?? defaultAvatar,
+          name: datum.profiles.full_name ?? defaultName,
         },
         comments: datum.comments.map((comment) => ({
           id: comment.id,
           userID: comment.user_id,
           parentCommentID: comment.parent_comment_id,
           content: comment.content,
-          createdAt: comment.created_at,
+          createdAt: formatTimestamp(comment.created_at ?? ""),
+          profile: {
+            id: comment.profiles.id,
+            avatarURL: comment.profiles.avatar_url ?? defaultAvatar,
+            name: comment.profiles.full_name ?? defaultName,
+          },
         })),
       }));
 
