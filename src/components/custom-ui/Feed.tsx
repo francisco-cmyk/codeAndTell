@@ -19,6 +19,7 @@ import {
 } from "../ui-lib/Carousel";
 import { Skeleton } from "../ui-lib/Skeleton";
 import { MessageCircle } from "lucide-react";
+import parse from "html-react-parser";
 
 type FeedProps = {
   isLoading: boolean;
@@ -54,13 +55,13 @@ export default function Feed(props: FeedProps) {
 
   return (
     <div
-      className={`max-w-3xl h-full grid grid-cols-1 gap-y-12 p-3 pb-44 place-self-center overflow-y-auto no-scrollbar`}
+      className={`min-w-[700px] max-w-3xl h-full grid grid-cols-1 gap-y-12 p-3 pb-44 place-self-center overflow-y-auto no-scrollbar`}
     >
       {props.isLoading
         ? placeholders.map((_, index) => (
             <Skeleton
               key={index}
-              className={`min-h-[300px] place-self-center`}
+              className={`min-w-full min-h-[300px] place-self-center`}
             />
           ))
         : props.posts.map((post, index) => (
@@ -87,7 +88,7 @@ export default function Feed(props: FeedProps) {
                   <p>{post.createdAt}</p>
                 </CardDescription>
                 <CardDescription className={`dark:text-slate-50`}>
-                  {post.description}
+                  {parse(post.description ?? "")}
                 </CardDescription>
               </CardHeader>
               <CardContent

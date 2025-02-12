@@ -19,7 +19,15 @@ export default function getMergeState<State>(
 }
 
 export function formatTimestamp(timestamp: string) {
-  return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
+  if (!timestamp) return "";
+
+  const utcDate = new Date(timestamp);
+  const localTime = new Date(
+    utcDate.toLocaleString("en-US", {
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    })
+  );
+  return formatDistanceToNow(localTime, { addSuffix: true });
 }
 
 export function createAcronym(name: string, length = 2) {

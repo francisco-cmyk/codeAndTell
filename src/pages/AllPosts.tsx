@@ -22,7 +22,7 @@ export default function AllPosts() {
   const { data: posts = [], isLoading: isLoadingPosts } = useGetPosts();
 
   const postKeyedById = keyBy(posts, "id");
-  const selectedPost = postKeyedById[state.selectedID ?? ""];
+  // const selectedPost = postKeyedById[state.selectedID ?? ""]; TODO: implement
   const selectedComments = postKeyedById[state.selectedCommentPostID ?? ""];
 
   function handleSelectPost(id: string): void {
