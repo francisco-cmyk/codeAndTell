@@ -119,7 +119,7 @@ export default function PostForm() {
             <FormField
               control={form.control}
               name='badges'
-              render={({ field }) => (
+              render={() => (
                 <FormItem>
                   <FormLabel>Badges</FormLabel>
                   <MultiSelect
