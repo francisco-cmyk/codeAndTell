@@ -18,20 +18,14 @@ import {
   CarouselPrevious,
 } from "../ui-lib/Carousel";
 import { Skeleton } from "../ui-lib/Skeleton";
-import { Trash2, MessageCircle, TriangleAlert } from "lucide-react";
+import { Trash2, MessageCircle } from "lucide-react";
 import parse from "html-react-parser";
 import { Button } from "../ui-lib/Button";
 import { useAuthContext } from "../../context/auth";
 import useDeletePost from "../../hooks/useDeletePost";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "../ui-lib/Dialog";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import DeleteDialog from "./DeleteDialog";
 
 type FeedProps = {
   isLoading: boolean;
@@ -96,7 +90,7 @@ export default function Feed(props: FeedProps) {
     <div
       className={`min-w-[700px] max-w-3xl h-full grid grid-cols-1 gap-y-12 p-3 pb-44 place-self-center overflow-y-auto no-scrollbar`}
     >
-      <DeletePostDialog
+      <DeleteDialog
         isOpen={!!deletePostID}
         handleDelete={handleDeletePost}
         onClose={() => setDeletePostID(null)}
@@ -206,45 +200,6 @@ export default function Feed(props: FeedProps) {
             </Card>
           ))}
     </div>
-  );
-}
-
-type DeleteDialogProp = {
-  isOpen: boolean;
-  handleDelete: () => void;
-  onClose: () => void;
-};
-
-function DeletePostDialog(props: DeleteDialogProp) {
-  return (
-    <Dialog open={props.isOpen} onOpenChange={props.onClose}>
-      <DialogContent
-        className='max-w-96'
-        aria-describedby='Warning modal for deleting post action'
-      >
-        <DialogHeader>
-          <DialogTitle className='w-full flex justify-center mb-3'>
-            <TriangleAlert className='text-red-400' />
-          </DialogTitle>
-          <DialogTitle>Are you super duper sure?</DialogTitle>
-        </DialogHeader>
-        <DialogDescription>
-          <p className='text-xs'>
-            This will permanently delete this post. Once deleted your post will
-            be gone forever.
-          </p>
-        </DialogDescription>
-
-        <div className='w-full flex justify-between mt-4'>
-          <Button variant='outline' onClick={props.onClose}>
-            cancel
-          </Button>
-          <Button variant='destructive' onClick={props.handleDelete}>
-            delete
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
   );
 }
 

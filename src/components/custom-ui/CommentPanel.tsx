@@ -64,7 +64,7 @@ export default function Comments(props: PostViewProps) {
         <div className='flex flex-col'>
           <div className='w-full flex flex-col '>
             <p className='font-semibold text-xl'>{props.post.title}</p>
-            <p className='text-sm mt-1 overflow-hidden text-ellipsis'>
+            <p className='text-sm mt-1 line-clamp-4'>
               {parse(props.post.description ?? "")}
             </p>
             <span className='text-xs text-right font-semibold'>{`by ${props.post.profile.name}`}</span>

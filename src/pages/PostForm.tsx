@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import useNewPost from "../hooks/useNewPost";
 import { toast } from "react-toastify";
 import TiptapEditor from "../components/custom-ui/TipTapEditor";
+import { Loader2Icon } from "lucide-react";
 
 const tagList = [
   { value: "discord", label: "discord" },
@@ -33,7 +34,7 @@ const tagList = [
 export default function PostForm() {
   const formSchema = z.object({
     title: z.string().min(2).max(50),
-    description: z.string().min(2).max(300),
+    description: z.string().min(2).max(5000),
     badges: z.string().array().min(1).max(3),
   });
 
@@ -49,7 +50,7 @@ export default function PostForm() {
   const navigate = useNavigate();
 
   const { user } = useAuthContext();
-  const { mutate: newPost } = useNewPost();
+  const { mutate: newPost, isPending: isLoadingNewPost } = useNewPost();
 
   function createPost(values: z.infer<typeof formSchema>) {
     if (!values.title) {
@@ -67,7 +68,9 @@ export default function PostForm() {
       },
       {
         onSuccess: () => {
-          navigate("/");
+          setTimeout(() => {
+            navigate("/");
+          }, 1000);
         },
         onError: (error) => {
           console.log(error);
@@ -77,7 +80,10 @@ export default function PostForm() {
   }
 
   return (
-    <div className='flex-grow min-h-full w-full flex justify-center pt-24'>
+    <div className='flex-grow relative min-h-full w-full flex justify-center pt-24'>
+      {isLoadingNewPost && (
+        <Loader2Icon size={40} className='absolute animate-spin' />
+      )}
       <div className='2xl:w-3/4 w-5/6 flex justify-center'>
         <Form {...form}>
           <form

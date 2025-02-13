@@ -13,13 +13,26 @@ const CommentSchema = z.object({
   id: z.number(),
   post_id: z.string(),
   user_id: z.string(),
-  content: z.string(),
+  comment_text: z.string(),
   parent_comment_id: z.nullable(z.string()),
   created_at: z.string(),
   profiles: z.object({
+    //User profile
     id: z.string(),
     avatar_url: z.nullable(z.string()),
     full_name: z.nullable(z.string()),
+  }),
+  post: z.object({
+    created_at: z.string(),
+    created_by_id: z.string(),
+    description: z.string(),
+    id: z.string(),
+    title: z.string(),
+    author: z.object({
+      id: z.string(),
+      avatar_url: z.nullable(z.string()),
+      full_name: z.nullable(z.string()),
+    }),
   }),
 });
 
@@ -34,7 +47,7 @@ async function fetchUserComments(
       .select(
         `
               id,
-              content,
+              comment_text:content,
               created_at,
               user_id,
               post_id,
@@ -43,7 +56,19 @@ async function fetchUserComments(
                 id,
                 full_name,
                 avatar_url
-          )
+            ),
+            post:content!comments_post_id_fkey (
+                id,
+                created_by_id,
+                title,
+                description,
+                created_at,
+                author:profiles!content_created_by_id_fkey (
+                  id,
+                  full_name,
+                  avatar_url
+               )
+            )
         `
       )
       .eq("user_id", userID)
@@ -89,13 +114,24 @@ export default function useGetAllUserComments(params: Params) {
         id: datum.id,
         userID: datum.user_id,
         parentCommentID: datum.parent_comment_id,
-        content: datum.content,
+        content: datum.comment_text,
         createdAt: formatTimestamp(datum.created_at),
         postID: datum.post_id,
         profile: {
           id: datum.profiles.id,
           avatarURL: datum.profiles.avatar_url ?? defaultAvatar,
           name: datum.profiles.full_name ?? defaultName,
+        },
+        post: {
+          createdAt: formatTimestamp(datum.post.created_at),
+          description: datum.post.description,
+          id: datum.post.id,
+          title: datum.post.title,
+          author: {
+            id: datum.post.author.id,
+            avatarURL: datum.post.author.avatar_url ?? defaultAvatar,
+            name: datum.post.author.full_name ?? defaultName,
+          },
         },
       }));
     },

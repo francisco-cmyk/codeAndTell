@@ -43,6 +43,17 @@ export type CommentType = {
     avatarURL: string;
     name: string;
   };
+  post: {
+    createdAt: string;
+    description: string;
+    id: string;
+    title: string;
+    author: {
+      id: string;
+      avatarURL: string;
+      name: string;
+    };
+  };
 };
 
 export type Tags = {

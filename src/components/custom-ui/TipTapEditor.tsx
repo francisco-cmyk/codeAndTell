@@ -30,8 +30,8 @@ type EditorProps = {
   value?: string;
   variant?: VariantType;
   showSubmit?: boolean;
-  onChange: (content: string) => void;
-  onSubmit?: () => void;
+  onChange?: (content: string) => void;
+  onSubmit?: (content?: string) => void;
 };
 export default function TiptapEditor(props: EditorProps) {
   const { isAuthenticated } = useAuthContext();
@@ -54,7 +54,9 @@ export default function TiptapEditor(props: EditorProps) {
     onUpdate: ({ editor }) => {
       const html = editor.getHTML();
       setContent(html);
-      props.onChange(html);
+      if (props.onChange) {
+        props.onChange(html);
+      }
     },
   });
 
@@ -117,7 +119,7 @@ export default function TiptapEditor(props: EditorProps) {
 
     if (!editor) return;
     if (props.onSubmit) {
-      props.onSubmit();
+      props.onSubmit(content);
       editor.commands.setContent("");
     }
   }
