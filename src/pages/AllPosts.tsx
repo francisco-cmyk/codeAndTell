@@ -22,7 +22,7 @@ export default function AllPosts() {
   const { data: posts = [], isLoading: isLoadingPosts } = useGetPosts();
 
   const postKeyedById = keyBy(posts, "id");
-  const selectedPost = postKeyedById[state.selectedID ?? ""];
+  // const selectedPost = postKeyedById[state.selectedID ?? ""]; TODO: implement
   const selectedComments = postKeyedById[state.selectedCommentPostID ?? ""];
 
   function handleSelectPost(id: string): void {
@@ -34,11 +34,7 @@ export default function AllPosts() {
   }
 
   function handleSelectedCommentPostID(id: string): void {
-    if (!state.selectedCommentPostID) {
-      mergeState({ selectedCommentPostID: id });
-      return;
-    }
-    mergeState({ selectedCommentPostID: "" });
+    mergeState({ selectedCommentPostID: id });
   }
 
   function handleCommentsClose() {

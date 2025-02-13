@@ -144,7 +144,7 @@ export default function useGetUserPosts(params: Params) {
           userID: comment.user_id,
           parentCommentID: comment.parent_comment_id,
           content: comment.content,
-          createdAt: comment.created_at,
+          createdAt: formatTimestamp(comment.created_at ?? ""),
           profile: {
             id: comment.profiles.id,
             avatarURL: comment.profiles.avatar_url ?? defaultAvatar,

@@ -13,13 +13,16 @@ export default function usePostComment() {
   return useMutation({
     mutationKey: ["commment"],
     mutationFn: async (params: Params) => {
-      await supabase.from("comments").insert([
+      const { error } = await supabase.from("comments").insert([
         {
           post_id: params.postID,
           user_id: params.userID,
           content: params.content,
         },
       ]);
+      if (error) {
+        throw new Error(error.message);
+      }
     },
     onError: (error) => {
       if (error) {

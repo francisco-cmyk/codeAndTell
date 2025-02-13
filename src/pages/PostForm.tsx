@@ -11,12 +11,12 @@ import {
   FormLabel,
 } from "../components/ui-lib/Form";
 import { Input } from "../components/ui-lib/Input";
-import { Textarea } from "../components/ui-lib/TextArea";
 import { MultiSelect } from "../components/ui-lib/MultiSelect";
 import { useAuthContext } from "../context/auth";
 import { useNavigate } from "react-router-dom";
 import useNewPost from "../hooks/useNewPost";
 import { toast } from "react-toastify";
+import TiptapEditor from "../components/custom-ui/TipTapEditor";
 
 const tagList = [
   { value: "discord", label: "discord" },
@@ -48,7 +48,7 @@ export default function PostForm() {
 
   const navigate = useNavigate();
 
-  const { user, isAuthenticated } = useAuthContext();
+  const { user } = useAuthContext();
   const { mutate: newPost } = useNewPost();
 
   function createPost(values: z.infer<typeof formSchema>) {
@@ -77,59 +77,68 @@ export default function PostForm() {
   }
 
   return (
-    <div className='flex-grow h-screen flex flex-col justify-center items-center'>
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(createPost)}
-          className='w-2/4 space-y-4'
-        >
-          <FormField
-            control={form.control}
-            name='title'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Title</FormLabel>
-                <FormControl>
-                  <Input placeholder='' {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name='description'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Description</FormLabel>
-                <FormDescription>Tell us all about this thing.</FormDescription>
-                <FormControl>
-                  <Textarea className='resize-none' placeholder='' {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name='badges'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Badges</FormLabel>
-                <MultiSelect
-                  options={tagList}
-                  onValueChange={(value) => {
-                    form.setValue("badges", value);
-                  }}
-                  placeholder='Select badges'
-                  variant='inverted'
-                  animation={2}
-                  maxCount={3}
-                />
-              </FormItem>
-            )}
-          />
-          <Button type='submit'>Submit</Button>
-        </form>
-      </Form>
+    <div className='flex-grow min-h-full w-full flex justify-center pt-24'>
+      <div className='2xl:w-3/4 w-5/6 flex justify-center'>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(createPost)}
+            className='w-2/4 space-y-4'
+          >
+            <FormField
+              control={form.control}
+              name='title'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Title</FormLabel>
+                  <FormDescription>make it catchy!</FormDescription>
+                  <FormControl>
+                    <Input placeholder='' {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name='description'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormDescription>
+                    tell us all about this thing.
+                  </FormDescription>
+                  <FormControl>
+                    <TiptapEditor
+                      value={field.value}
+                      onChange={field.onChange}
+                      showSubmit={false}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name='badges'
+              render={() => (
+                <FormItem>
+                  <FormLabel>Badges</FormLabel>
+                  <MultiSelect
+                    options={tagList}
+                    onValueChange={(value) => {
+                      form.setValue("badges", value);
+                    }}
+                    placeholder='Select badges'
+                    variant='inverted'
+                    animation={2}
+                    maxCount={3}
+                  />
+                </FormItem>
+              )}
+            />
+            <Button type='submit'>Submit</Button>
+          </form>
+        </Form>
+      </div>
     </div>
   );
 }

@@ -3,12 +3,12 @@ import { PostType } from "../../lib/types";
 import { Separator } from "../ui-lib/Separator";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui-lib/Avatar";
 import { createAcronym } from "../../lib/utils";
-import { Textarea } from "../ui-lib/TextArea";
 import { useQueryClient } from "@tanstack/react-query";
-import { Button } from "../ui-lib/Button";
 import { useAuthContext } from "../../context/auth";
 import { toast } from "react-toastify";
 import usePostComment from "../../hooks/usePostComment";
+import parse from "html-react-parser";
+import TiptapEditor from "./TipTapEditor";
 
 type PostViewProps = {
   post: PostType;
@@ -17,7 +17,7 @@ type PostViewProps = {
 };
 
 export default function Comments(props: PostViewProps) {
-  const { isAuthenticated, user } = useAuthContext();
+  const { user } = useAuthContext();
   const queryClient = useQueryClient();
 
   const [comment, setComment] = useState("");
@@ -40,11 +40,15 @@ export default function Comments(props: PostViewProps) {
       },
       {
         onSuccess: () => {
-          setComment("");
+          clearComment();
           queryClient.invalidateQueries({ queryKey: ["posts"] });
         },
       }
     );
+  }
+
+  function clearComment() {
+    setComment("");
   }
 
   if (!props.post) {
@@ -53,14 +57,16 @@ export default function Comments(props: PostViewProps) {
 
   return (
     <div
-      className={`relative max-w-md h-[calc(100vh-70px)] overflow-y-auto shadow-lg bg-slate-50 dark:bg-zinc-900  transition-transform duration-300 ease-in-out p-3 pb-12 no-scrollbar
+      className={`relative min-w-[440px] max-w-md h-[calc(100vh-70px)] overflow-y-auto shadow-lg bg-card dark:bg-zinc-900  transition-transform duration-300 ease-in-out p-3 pb-12 no-scrollbar
       ${props.isOpen ? "translate-x-0 " : "translate-x-full "}`}
     >
       <div className='h-full p-4 text-lg flex flex-col justify-between'>
         <div className='flex flex-col'>
           <div className='w-full flex flex-col '>
             <p className='font-semibold text-xl'>{props.post.title}</p>
-            <p className='text-sm mt-1'>{props.post.description}</p>
+            <p className='text-sm mt-1 overflow-hidden text-ellipsis'>
+              {parse(props.post.description ?? "")}
+            </p>
             <span className='text-xs text-right font-semibold'>{`by ${props.post.profile.name}`}</span>
             <Separator className='mb-5 mt-2' />
           </div>
@@ -85,7 +91,7 @@ export default function Comments(props: PostViewProps) {
 
                       <p className='text-xs mb-2'>{comment.profile.name}</p>
                     </div>
-                    <p className='pl-2 pb-2'>{comment.content}</p>
+                    <p className='pl-2 pb-2'>{parse(comment.content)}</p>
                     <span className='text-xs text-right'>
                       {comment.createdAt}
                     </span>
@@ -96,20 +102,13 @@ export default function Comments(props: PostViewProps) {
           </div>
         </div>
 
-        <div className='w-full p-4 '>
-          <Textarea
-            className='dark:bg-zinc-700 h-24'
+        <div className='w-full'>
+          <TiptapEditor
+            variant='small'
             value={comment}
-            onChange={(e) => setComment(e.target.value)}
+            onChange={(value) => setComment(value)}
+            onSubmit={handleSubmitComment}
           />
-          <div className='w-full flex justify-between mt-2'>
-            <Button variant='outline' onClick={props.onClose}>
-              close
-            </Button>
-            <Button disabled={!isAuthenticated} onClick={handleSubmitComment}>
-              send
-            </Button>
-          </div>
         </div>
       </div>
     </div>

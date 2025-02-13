@@ -11,10 +11,13 @@ export default function useEmailLogin() {
   return useMutation({
     mutationKey: ["signIn"],
     mutationFn: async (params: Params) => {
-      await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email: params.email,
         password: params.password,
       });
+      if (error) {
+        throw new Error(error.message);
+      }
     },
     onError: (error) => {
       if (error) {

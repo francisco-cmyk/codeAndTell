@@ -31,6 +31,20 @@ export type PostType = {
   }[];
 };
 
+export type CommentType = {
+  id: number;
+  userID: string;
+  content: string;
+  postID: string;
+  parentCommentID: string | null;
+  createdAt: string | null;
+  profile: {
+    id: string;
+    avatarURL: string;
+    name: string;
+  };
+};
+
 export type Tags = {
   value: string;
   label: string;

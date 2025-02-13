@@ -5,10 +5,14 @@ import {
 } from "../components/ui-lib/Avatar";
 import { useAuthContext } from "../context/auth";
 import useGetUserPosts from "../hooks/useGetUserPosts";
-import { useEffect, useState } from "react";
-import getMergeState from "../lib/utils";
+import { useEffect } from "react";
 import Feed from "../components/custom-ui/Feed";
 import { toast } from "react-toastify";
+import { useSearchParams } from "react-router-dom";
+import useGetUserCommentByPostID from "../hooks/useGetUserCommentByPostID";
+import { keyBy } from "lodash";
+import CommentsSection from "../components/custom-ui/CommentSection";
+import useGetAllUserComments from "../hooks/useGetAllUserComments";
 
 const View = {
   posts: "posts",
@@ -24,25 +28,39 @@ type Tabs = {
   onClick: () => void;
 };
 
-type State = {
-  selectedID: string | null;
-  viewTab: View;
-};
+// type State = {
+//   selectedID: string | null;
+// };
 
-const initialState: State = {
-  selectedID: null,
-  viewTab: View.posts,
-};
+// const initialState: State = {
+//   selectedID: null,
+// };
 
 export default function UserPosts() {
   const { user, isAuthenticated, setIsLoginOpen } = useAuthContext();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [state, setState] = useState(initialState);
-  const mergeState = getMergeState(setState);
+  // const [state, setState] = useState(initialState);
+  // const mergeState = getMergeState(setState);
+
+  const viewTab = searchParams.get("tab") ?? View.posts;
 
   const { data: posts = [], isLoading: isLoadingPosts } = useGetUserPosts({
     userID: user.id,
   });
+
+  const selectedPostIDSearchParam = searchParams.get("postID") ?? "";
+  const { data: _comments = [], isLoading: isLoadingComments } =
+    useGetUserCommentByPostID({
+      userID: user.id,
+      postID: selectedPostIDSearchParam,
+    });
+  const { data: allComments = [], isLoading: isLoadingAllComments } =
+    useGetAllUserComments({
+      userID: user.id,
+      postID: selectedPostIDSearchParam,
+    });
+  const comments = _comments.length > 0 ? _comments : allComments;
 
   useEffect(() => {
     if (isAuthenticated) return;
@@ -58,20 +76,38 @@ export default function UserPosts() {
     }
   }, [isAuthenticated]);
 
-  // const postKeyedById = keyBy(posts, "id");
-  // const selectedPost = postKeyedById[state.selectedID ?? ""];
+  useEffect(() => {
+    if (!searchParams.has("tab")) {
+      setSearchParams({ tab: "posts" });
+    }
+  }, []);
 
-  // function handleSelectPost(id: string) {
-  //   mergeState({ selectedID: id });
-  // }
+  const postKeyedById = keyBy(posts, "id");
+
+  function handleSelectedComments(id: string) {
+    setSearchParams({ tab: View.comments, postID: id });
+  }
 
   function renderContent() {
-    switch (state.viewTab) {
+    switch (viewTab) {
       case View.posts: {
-        return <Feed posts={posts} isLoading={isLoadingPosts} />;
+        return (
+          <Feed
+            posts={posts}
+            isLoading={isLoadingPosts}
+            onCommentSelect={handleSelectedComments}
+            isUserPost
+          />
+        );
       }
       case View.comments: {
-        return <CommentsSection />;
+        return (
+          <CommentsSection
+            comments={comments}
+            isLoading={isLoadingComments || isLoadingAllComments}
+            post={postKeyedById[selectedPostIDSearchParam]}
+          />
+        );
       }
       case View.tags: {
         return <TagsSection />;
@@ -83,17 +119,17 @@ export default function UserPosts() {
     {
       label: "posts",
       value: View.posts,
-      onClick: () => mergeState({ viewTab: View.posts }),
+      onClick: () => setSearchParams({ tab: View.posts }),
     },
     {
       label: "comments",
       value: View.comments,
-      onClick: () => mergeState({ viewTab: View.comments }),
+      onClick: () => setSearchParams({ tab: View.comments }),
     },
     {
       label: "tags",
       value: View.tags,
-      onClick: () => mergeState({ viewTab: View.tags }),
+      onClick: () => setSearchParams({ tab: View.tags }),
     },
   ];
 
@@ -116,7 +152,7 @@ export default function UserPosts() {
           <div
             key={`${tab.label}-${index}`}
             className={`group flex h-8 w-full items-center justify-start rounded-lg px-2 font-normal text-foreground underline-offset-2 hover:bg-slate-200 dark:hover:bg-accent hover:text-accent-foreground mb-1 ${
-              state.viewTab === tab.value
+              viewTab === tab.value
                 ? "bg-slate-200 hover:bg-slate-300 dark:bg-accent"
                 : ""
             }`}
@@ -132,16 +168,8 @@ export default function UserPosts() {
 
 function TagsSection() {
   return (
-    <div className=' w-full h-full  p-6 flex'>
+    <div className=' w-full h-full  p-6 flex justify-center'>
       <p>Tags</p>
-    </div>
-  );
-}
-
-function CommentsSection() {
-  return (
-    <div className=' w-full h-full  p-6 flex'>
-      <p>Comments</p>
     </div>
   );
 }

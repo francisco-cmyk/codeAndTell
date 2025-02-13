@@ -13,8 +13,8 @@ import AllPosts from "./pages/AllPosts";
 const queryClient = new QueryClient();
 
 const contextClass = {
-  success: "dark:bg-zinc-800 bg-zinc-50 text-zinc-500 dark:text-zinc-50",
-  error: "bg-red-50 text-zinc-900",
+  success: "dark:bg-zinc-800 bg-zinc-50 text-zinc-300 dark:text-zinc-50",
+  error: "bg-red-50 text-zinc-900  dark:bg-red-300  dark:text-red-500",
   info: "dark:bg-zinc-800 dark:text-zinc-50 bg-zinc-50 text-zinc-900",
   warning: "bg-orange-400 dark:bg-orange-200 dark:text-zinc-600",
   default: "bg-indigo-600",

@@ -13,7 +13,7 @@ export default function useNewPost() {
   return useMutation({
     mutationKey: ["newPost"],
     mutationFn: async (params: Params) => {
-      await supabase.from("content").insert([
+      const { error } = await supabase.from("content").insert([
         {
           created_by_id: params.userID,
           title: params.title,
@@ -21,6 +21,10 @@ export default function useNewPost() {
           badges: params.badges,
         },
       ]);
+
+      if (error) {
+        throw new Error(error.message);
+      }
     },
     onError: (error) => {
       console.warn("error", error);
