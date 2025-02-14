@@ -1,10 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../config/supabaseConfig";
 import { z, ZodError } from "zod";
-import { toast } from "react-toastify";
 import { PostgrestError } from "@supabase/supabase-js";
 import { CommentType } from "../lib/types";
-import { formatTimestamp } from "../lib/utils";
+import { formatTimestamp, showToast } from "../lib/utils";
 
 const defaultName = "Anon";
 const defaultAvatar = "public/anon-user.png";
@@ -86,12 +85,16 @@ async function fetchUserComments(
         return `${issue.path.join(".")}: ${issue.message}`;
       });
 
-      toast.error(`Error was an error retrieving Comments:, ${errorMessages}`, {
+      showToast({
+        type: "error",
+        message: `Error was an error retrieving Comments:, ${errorMessages}`,
         toastId: "fetchUserCommentsError",
       });
     } else {
       const Error = error as PostgrestError;
-      toast.error(`Error was an error retrieving Comments:, ${Error.message}`, {
+      showToast({
+        type: "error",
+        message: `Error was an error retrieving Comments:, ${Error.message}`,
         toastId: "fetchUserCommentsError",
       });
     }

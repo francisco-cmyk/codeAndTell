@@ -1,8 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../config/supabaseConfig";
 import { z, ZodError } from "zod";
-import { formatTimestamp } from "../lib/utils";
-import { toast } from "react-toastify";
+import { formatTimestamp, showToast } from "../lib/utils";
 import { PostgrestError } from "@supabase/supabase-js";
 import { PostType } from "../lib/types";
 
@@ -98,12 +97,16 @@ async function fetchUserPosts(
         return `${issue.path.join(".")}: ${issue.message}`;
       });
 
-      toast.error(`Error was an error retrieving posts:, ${errorMessages}`, {
+      showToast({
+        type: "error",
+        message: `Error was an error retrieving posts:, ${errorMessages}`,
         toastId: "fetchUserPostsError",
       });
     } else {
       const Error = error as PostgrestError;
-      toast.error(`Error was an error retrieving posts:, ${Error.message}`, {
+      showToast({
+        type: "error",
+        message: `Error was an error retrieving posts:, ${Error.message}`,
         toastId: "fetchUserPostsError",
       });
     }

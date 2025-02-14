@@ -7,12 +7,12 @@ import { useAuthContext } from "../context/auth";
 import useGetUserPosts from "../hooks/useGetUserPosts";
 import { useEffect } from "react";
 import Feed from "../components/custom-ui/Feed";
-import { toast } from "react-toastify";
 import { useSearchParams } from "react-router-dom";
 import useGetUserCommentByPostID from "../hooks/useGetUserCommentByPostID";
 import { keyBy } from "lodash";
 import CommentsSection from "../components/custom-ui/CommentSection";
 import useGetAllUserComments from "../hooks/useGetAllUserComments";
+import { showToast } from "../lib/utils";
 
 const View = {
   posts: "posts",
@@ -68,7 +68,9 @@ export default function UserPosts() {
     const hasModalBeenShown = sessionStorage.getItem("hasModalBeenShown");
 
     if (!hasModalBeenShown) {
-      toast.info("Please sign in to see your posts", {
+      showToast({
+        type: "info",
+        message: "Please sign in to see your posts",
         toastId: "signInInfo",
       });
       setIsLoginOpen(true);

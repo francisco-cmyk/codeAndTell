@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { supabase } from "../config/supabaseConfig";
-import { toast } from "react-toastify";
+import { showToast } from "../lib/utils";
 
 type Params = {
   email: string;
@@ -21,13 +21,17 @@ export default function useEmailLogin() {
     },
     onError: (error) => {
       if (error) {
-        toast.error(`Error during logging in:, ${error.message}`, {
+        showToast({
+          type: "error",
+          message: `Error during logging in:, ${error.message}`,
           toastId: "emailLoginError",
         });
       }
     },
     onSuccess: () => {
-      toast.success(`Login was successful`, {
+      showToast({
+        type: "success",
+        message: `Login was successful`,
         toastId: "emailLoginSuccess",
       });
     },

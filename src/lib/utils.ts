@@ -3,6 +3,8 @@ import { twMerge } from "tailwind-merge";
 import { formatDistanceToNow } from "date-fns";
 import { Tags } from "./types";
 import { Cat, Dog, Fish, Rabbit, Turtle } from "lucide-react";
+import { toast, ToastOptions, ToastPosition } from "react-toastify";
+import CustomToast from "../components/custom-ui/CustomToast";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -17,6 +19,48 @@ export default function getMergeState<State>(
     return ss((s: State) => ({ ...s, ...ps }));
   };
 }
+
+// React Toastify Util
+
+type ShowToastParams = {
+  type: "success" | "error" | "warning" | "info";
+  message: string;
+  toastId?: string;
+  position?: ToastPosition;
+  options?: ToastOptions;
+};
+
+export function showToast({
+  type,
+  message,
+  toastId,
+  options,
+}: ShowToastParams) {
+  const baseClass = `custom-toast`;
+
+  const typeClass = {
+    success: "custom-toast-success",
+    error: "custom-toast-error",
+    warning: "custom-toast-warning",
+    info: "custom-toast-info",
+  };
+
+  const defaultPosition = options?.position ?? "top-right";
+  const toastContent: { title: string; content: string } = {
+    title: type,
+    content: message,
+  };
+
+  toast[type](CustomToast, {
+    ...options,
+    data: toastContent,
+    className: `${baseClass} ${typeClass[type]}`,
+    toastId: toastId,
+    position: defaultPosition,
+  });
+}
+
+// Format time
 
 export function formatTimestamp(timestamp: string) {
   if (!timestamp) return "";

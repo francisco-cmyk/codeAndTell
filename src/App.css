@@ -105,3 +105,23 @@
 .editor-content [contenteditable]:focus {
   outline: none !important; /* Removes the focus ring */
 }
+
+.custom-toast {
+  @apply flex min-h-10 p-4 rounded-md justify-between shadow-lg cursor-pointer mb-2 !important;
+}
+
+.custom-toast-success {
+  @apply dark:bg-zinc-700 bg-slate-50 text-zinc-900 dark:text-zinc-50 !important;
+}
+
+.custom-toast-error {
+  @apply bg-red-50 text-zinc-900  dark:bg-red-300  dark:text-red-500 !important;
+}
+
+.custom-toast-warning {
+  @apply bg-yellow-100 dark:bg-yellow-100 dark:text-zinc-600 text-zinc-700 !important;
+}
+
+.custom-toast-info {
+  @apply dark:bg-zinc-700 dark:text-zinc-50 bg-zinc-50 text-zinc-900 !important;
+}

@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { supabase } from "../config/supabaseConfig";
-import { toast } from "react-toastify";
+import { showToast } from "../lib/utils";
 
 type Params = {
   commentID: number;
@@ -24,13 +24,17 @@ export default function useEditComment() {
     },
     onError: (error) => {
       if (error) {
-        toast.error(`Error updating your Comment:, ${error.message}`, {
+        showToast({
+          type: "error",
+          message: `Error updating your Comment:, ${error.message}`,
           toastId: "updateCommentError",
         });
       }
     },
     onSuccess: () => {
-      toast.success(`Successfully updated the Comment`, {
+      showToast({
+        type: "success",
+        message: `Successfully updated the Comment`,
         toastId: "updateCommentSuccess",
       });
     },

@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { supabase } from "../config/supabaseConfig";
-import { toast } from "react-toastify";
+import { showToast } from "../lib/utils";
 
 type Params = {
   commentID: number;
@@ -23,13 +23,17 @@ export default function useDeleteComment() {
     },
     onError: (error) => {
       if (error) {
-        toast.error(`Error deleting your Comment:, ${error.message}`, {
+        showToast({
+          type: "error",
+          message: `Error deleting your Comment:, ${error.message}`,
           toastId: "deleteCommentError",
         });
       }
     },
     onSuccess: () => {
-      toast.success(`Successfully deleted the Comment`, {
+      showToast({
+        type: "success",
+        message: "Successfully deleted the Comment",
         toastId: "deleteCommentSuccess",
       });
     },

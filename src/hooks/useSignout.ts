@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { supabase } from "../config/supabaseConfig";
-import { toast } from "react-toastify";
+import { showToast } from "../lib/utils";
 
 export default function useSignout() {
   return useMutation({
@@ -10,13 +10,17 @@ export default function useSignout() {
     },
     onError: (error) => {
       if (error) {
-        toast.error(`Error signing out:, ${error.message}`, {
+        showToast({
+          type: "error",
+          message: `Error signing out:, ${error.message}`,
           toastId: "logoutError",
         });
       }
     },
     onSuccess: () => {
-      toast.success(`Successfully signed out`, {
+      showToast({
+        type: "success",
+        message: `Successfully signed out`,
         toastId: "logoutSuccess",
       });
     },

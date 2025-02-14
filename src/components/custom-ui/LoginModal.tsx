@@ -11,12 +11,11 @@ import {
 import { Input } from "../ui-lib/Input";
 import { Separator } from "../ui-lib/Separator";
 import { useState } from "react";
-import getMergeState from "../../lib/utils";
+import getMergeState, { showToast } from "../../lib/utils";
 import { useDarkMode } from "../../context/theme";
 import { Provider } from "@supabase/supabase-js";
 import useAuthLogin from "../../hooks/useAuthLogin";
 import useEmailSignup from "../../hooks/useEmailSignup";
-import { toast } from "react-toastify";
 import useEmailLogin from "../../hooks/useEmailLogin";
 
 type OAuthButtonTypes = {
@@ -77,7 +76,9 @@ export default function LoginModal(props: LoginProps) {
         {
           onSuccess: () => {
             props.handleOpen();
-            toast.info("Please check your email to confirm your account", {
+            showToast({
+              type: "info",
+              message: "Please check your email to confirm your account",
               toastId: "emailConfirmation",
             });
           },

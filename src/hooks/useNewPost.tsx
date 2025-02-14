@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { supabase } from "../config/supabaseConfig";
-import { toast } from "react-toastify";
+import { showToast } from "../lib/utils";
 
 type Params = {
   userID: string;
@@ -28,10 +28,18 @@ export default function useNewPost() {
     },
     onError: (error) => {
       console.warn("error", error);
-      toast.error(`Error submitting your post:, ${error.message}`, {
+      showToast({
+        type: "error",
+        message: `Error submitting your post:, ${error.message}`,
         toastId: "newPostError",
       });
     },
-    onSuccess: () => {},
+    onSuccess: () => {
+      showToast({
+        type: "success",
+        message: `Successfully created post!`,
+        toastId: "newPostSuccess",
+      });
+    },
   });
 }
