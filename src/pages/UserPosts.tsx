@@ -3,6 +3,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "../components/ui-lib/Avatar";
+import { z } from "zod";
 import { useAuthContext } from "../context/auth";
 import useGetUserPosts from "../hooks/useGetUserPosts";
 import { useEffect } from "react";
@@ -12,12 +13,19 @@ import useGetUserCommentByPostID from "../hooks/useGetUserCommentByPostID";
 import { keyBy } from "lodash";
 import CommentsSection from "../components/custom-ui/CommentSection";
 import useGetAllUserComments from "../hooks/useGetAllUserComments";
-import { showToast } from "../lib/utils";
+import { getDiff, showToast } from "../lib/utils";
+import PostForm from "../components/custom-ui/PostForm";
+import { ChevronLeft, Loader2Icon } from "lucide-react";
+import useEditPost from "../hooks/useEditPost";
+import { formSchema } from "../lib/schemas";
+import { MediaPayload } from "../lib/types";
+import useGetUserPostByID from "../hooks/useGetPostByID";
 
 const View = {
   posts: "posts",
   comments: "comments",
   tags: "tags",
+  edit: "edit",
 } as const;
 
 type View = keyof typeof View;
@@ -28,28 +36,21 @@ type Tabs = {
   onClick: () => void;
 };
 
-// type State = {
-//   selectedID: string | null;
-// };
-
-// const initialState: State = {
-//   selectedID: null,
-// };
-
 export default function UserPosts() {
   const { user, isAuthenticated, setIsLoginOpen } = useAuthContext();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // const [state, setState] = useState(initialState);
-  // const mergeState = getMergeState(setState);
-
   const viewTab = searchParams.get("tab") ?? View.posts;
+  const selectedPostIDSearchParam = searchParams.get("postID") ?? "";
 
   const { data: posts = [], isLoading: isLoadingPosts } = useGetUserPosts({
     userID: user.id,
   });
+  const { data: post, isLoading: isLoadingPost } = useGetUserPostByID({
+    userID: user.id,
+    postID: selectedPostIDSearchParam,
+  });
 
-  const selectedPostIDSearchParam = searchParams.get("postID") ?? "";
   const { data: _comments = [], isLoading: isLoadingComments } =
     useGetUserCommentByPostID({
       userID: user.id,
@@ -61,6 +62,8 @@ export default function UserPosts() {
       postID: selectedPostIDSearchParam,
     });
   const comments = _comments.length > 0 ? _comments : allComments;
+
+  const { mutate: editPost, isPending: isLoadingEditPost } = useEditPost();
 
   useEffect(() => {
     if (isAuthenticated) return;
@@ -89,6 +92,68 @@ export default function UserPosts() {
   function handleSelectedComments(id: string) {
     setSearchParams({ tab: View.comments, postID: id });
   }
+  function handleSelectEditPost(id: string) {
+    setSearchParams({ tab: View.edit, postID: id });
+  }
+
+  function removeSearchParam() {
+    const newParams = new URLSearchParams();
+    newParams.set("tabs", "posts");
+    setSearchParams(newParams, { replace: true });
+  }
+
+  //TODO: THIS IS BROKEN ~ NEED TO FIX
+  async function handleSubmitEditPost(values: z.infer<typeof formSchema>) {
+    if (!selectedPostIDSearchParam || !post) return;
+
+    let uploadedUrls: string[] = [];
+
+    const media: MediaPayload = {
+      mediaType: null,
+      mediaSource: null,
+      mediaName: null,
+      mediaSize: null,
+    };
+
+    if (values.media && values.media.length > 0) {
+      // uploadedUrls = await uploadMedia.mutateAsync({ media: values.media });
+      media.mediaType = values.media.map((file) => file.type); // MIME types
+      media.mediaSize = values.media.map((file) => file.size); // File sizes in bytes
+      media.mediaName = values.media.map((file) => file.name); // File names
+      media.mediaSource = uploadedUrls;
+    }
+
+    const updatedPost = getDiff(
+      {
+        title: post.title,
+        description: post.description,
+        badges: post.badges,
+        media_source: post.mediaSource,
+        media_type: post.mediaType,
+        media_size: post.mediaSize,
+        media_name: post.mediaName,
+      },
+      {
+        title: values.title,
+        description: values.description,
+        badges: values.badges,
+        media_source: media.mediaSource,
+        media_type: media.mediaType,
+        media_size: media.mediaSize,
+        media_name: media.mediaName,
+      }
+    );
+
+    console.log(updatedPost);
+
+    // editPost({
+    //   userID: user.id,
+    //   postID: selectedPostIDSearchParam,
+    //   title: values.title,
+    //   description: values.description,
+    //   badges: values.badges,
+    // });
+  }
 
   function renderContent() {
     switch (viewTab) {
@@ -98,6 +163,7 @@ export default function UserPosts() {
             posts={posts}
             isLoading={isLoadingPosts}
             onCommentSelect={handleSelectedComments}
+            onPostEdit={handleSelectEditPost}
             isUserPost
           />
         );
@@ -109,6 +175,28 @@ export default function UserPosts() {
             isLoading={isLoadingComments || isLoadingAllComments}
             post={postKeyedById[selectedPostIDSearchParam]}
           />
+        );
+      }
+      case View.edit: {
+        return (
+          <div className='w-full flex flex-col items-center justify-center pt-12'>
+            {isLoadingEditPost && (
+              <Loader2Icon size={40} className='absolute animate-spin' />
+            )}
+            <div className='w-3/4  flex justify-start'>
+              <div
+                className='flex w-40 text-xs dark:hover:bg-zinc-700 hover:bg-zinc-400 mb-2 p-2 rounded-lg'
+                onClick={removeSearchParam}
+              >
+                <ChevronLeft size={15} />
+                <p>go back to posts</p>
+              </div>
+            </div>
+            <PostForm
+              post={post}
+              onSubmit={(values) => handleSubmitEditPost(values)}
+            />
+          </div>
         );
       }
       case View.tags: {

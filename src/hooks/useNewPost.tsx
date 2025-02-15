@@ -7,18 +7,35 @@ type Params = {
   title: string;
   description: string;
   badges: string[];
+  mediaName: string[] | null;
+  mediaType: string[] | null;
+  mediaSize: number[] | null;
+  mediaSource: string[] | null;
 };
 
 export default function useNewPost() {
   return useMutation({
     mutationKey: ["newPost"],
     mutationFn: async (params: Params) => {
+      if (!params.userID) {
+        showToast({
+          type: "warning",
+          message: `Please sign in to post`,
+          toastId: "newPostError",
+        });
+        throw new Error("Unauthorized: User must be signed in to submit post.");
+      }
+
       const { error } = await supabase.from("content").insert([
         {
           created_by_id: params.userID,
           title: params.title,
           description: params.description,
           badges: params.badges,
+          media_source: params.mediaSource,
+          media_type: params.mediaType,
+          media_size: params.mediaSize,
+          media_name: params.mediaName,
         },
       ]);
 

@@ -18,7 +18,7 @@ import {
   CarouselPrevious,
 } from "../ui-lib/Carousel";
 import { Skeleton } from "../ui-lib/Skeleton";
-import { Trash2, MessageCircle } from "lucide-react";
+import { Trash2, MessageCircle, PencilIcon } from "lucide-react";
 import parse from "html-react-parser";
 import { Button } from "../ui-lib/Button";
 import { useAuthContext } from "../../context/auth";
@@ -33,6 +33,7 @@ type FeedProps = {
   isUserPost?: boolean;
   onSelect?: (postID: string) => void;
   onCommentSelect?: (postID: string) => void;
+  onPostEdit?: (postID: string) => void;
 };
 
 export default function Feed(props: FeedProps) {
@@ -66,6 +67,12 @@ export default function Feed(props: FeedProps) {
   function handleCommentSelect(id: string) {
     if (props.onCommentSelect) {
       props.onCommentSelect(id);
+    }
+  }
+
+  function handlePostEdit(id: string) {
+    if (props.onPostEdit) {
+      props.onPostEdit(id);
     }
   }
 
@@ -130,10 +137,10 @@ export default function Feed(props: FeedProps) {
                 </CardDescription>
               </CardHeader>
               <CardContent
-                className='relative w-full p-1 mx-auto overflow-hidden rounded-lg'
+                className='relative w-full p-1 mx-auto overflow-hidden '
                 onClick={(e) => e.stopPropagation()}
               >
-                <Carousel className='w-full mx-auto rounded-lg'>
+                <Carousel className='w-full mx-auto'>
                   <CarouselContent>
                     {post.mediaUrl.map((image, index) => (
                       <CarouselItem
@@ -141,9 +148,9 @@ export default function Feed(props: FeedProps) {
                         className='relative w-full flex justify-center items-center p-2 rounded-lg'
                       >
                         <BackgroundImage image={image} />
-                        <div className='relative w-full max-h-[500px] flex justify-center items-center overflow-hidden'>
+                        <div className='relative w-full max-h-[500px] flex justify-center items-center overflow-hidden pl-4'>
                           <img
-                            className=' max-h-[500px] object-contain rounded-lg'
+                            className=' max-h-[500px] object-contain rounded-md'
                             src={image}
                           />
                         </div>
@@ -187,13 +194,28 @@ export default function Feed(props: FeedProps) {
                   </Button>
 
                   {isUserPost && (
-                    <Button
-                      variant='ghost'
-                      className='w-7 outline-non ml-3 '
-                      onClick={() => setDeletePostID(post.id)}
-                    >
-                      <Trash2 />
-                    </Button>
+                    <>
+                      <Button
+                        variant='ghost'
+                        className='w-7 outline-non ml-3 '
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handlePostEdit(post.id);
+                        }}
+                      >
+                        <PencilIcon />
+                      </Button>
+                      <Button
+                        variant='ghost'
+                        className='w-7 outline-non ml-3 '
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDeletePostID(post.id);
+                        }}
+                      >
+                        <Trash2 />
+                      </Button>
+                    </>
                   )}
                 </div>
               </CardFooter>

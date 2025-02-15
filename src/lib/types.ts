@@ -8,9 +8,9 @@ export type PostType = {
   description: string | null;
   badges: string[];
   mediaSource: string[];
-  mediaSize: number;
-  mediaName: string;
-  mediaType: string;
+  mediaSize: number[];
+  mediaName: string[];
+  mediaType: string[];
   mediaUrl: string[];
   profile: {
     id: string;
@@ -29,6 +29,22 @@ export type PostType = {
       name: string;
     };
   }[];
+};
+
+export type SinglePostType = {
+  id: string;
+  createdAt: string;
+  updatedAt: string | null;
+  createdById: string | null;
+  updatedById: string | null;
+  title: string | null;
+  description: string | null;
+  badges: string[];
+  mediaSource: string[];
+  mediaSize: number[];
+  mediaName: string[];
+  mediaType: string[];
+  mediaUrl: string[];
 };
 
 export type CommentType = {
@@ -60,4 +76,11 @@ export type Tags = {
   value: string;
   label: string;
   icon: React.FC<React.SVGProps<SVGSVGElement>>;
+};
+
+export type MediaPayload = {
+  mediaSource: string[] | null;
+  mediaType: string[] | null;
+  mediaSize: number[] | null;
+  mediaName: string[] | null;
 };

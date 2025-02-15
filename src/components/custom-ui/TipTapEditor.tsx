@@ -35,7 +35,7 @@ type EditorProps = {
 };
 export default function TiptapEditor(props: EditorProps) {
   const { isAuthenticated } = useAuthContext();
-  const [content, setContent] = useState(props.value ?? "");
+  const [content, setContent] = useState("");
   const [url, setUrl] = useState("");
 
   const variant = props.variant ? Variant[props.variant] : Variant.big;
@@ -63,6 +63,13 @@ export default function TiptapEditor(props: EditorProps) {
   useEffect(() => {
     return () => editor?.destroy();
   }, [editor]);
+
+  useEffect(() => {
+    if (!editor) return;
+    if (!content && props.value) {
+      editor.commands.setContent(props.value);
+    }
+  }, [props.value, editor]);
 
   function setLink() {
     if (!editor) return;

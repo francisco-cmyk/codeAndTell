@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Layout from "./pages/Layout";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import HelpPage from "./pages/HelpPage";
-import PostForm from "./pages/PostForm";
+import PostForm from "./pages/PostFormPage";
 import UserPosts from "./pages/UserPosts";
 import { ToastContainer } from "react-toastify";
 import { AuthenticationProvider } from "./context/auth";
