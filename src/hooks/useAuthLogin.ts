@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { supabase } from "../config/supabaseConfig";
-import { toast } from "react-toastify";
 import { Provider } from "@supabase/supabase-js";
+import { showToast } from "../lib/utils";
 
 export default function useAuthLogin() {
   return useMutation({
@@ -16,13 +16,17 @@ export default function useAuthLogin() {
     },
     onError: (error) => {
       if (error) {
-        toast.error(`Error during OAuth login::, ${error.message}`, {
+        showToast({
+          type: "error",
+          message: `Error during OAuth login::, ${error.message}`,
           toastId: "OauthLoginError",
         });
       }
     },
     onSuccess: () => {
-      toast.success(`OAuth login successful`, {
+      showToast({
+        type: "success",
+        message: "`OAuth login successful",
         toastId: "OauthLoginSuccess",
       });
     },

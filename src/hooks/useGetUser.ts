@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../config/supabaseConfig";
-import { toast } from "react-toastify";
 import { z } from "zod";
+import { showToast } from "../lib/utils";
 
 const UserSchema = z.object({
   id: z.string(),
@@ -29,7 +29,9 @@ export default function useGetSession(params: Params) {
         .single();
 
       if (profileError) {
-        toast.error(`Error fetching profile:, ${profileError.message}`, {
+        showToast({
+          type: "error",
+          message: `Error fetching profile:, ${profileError.message}`,
           toastId: "fetchProfile",
         });
         throw profileError;

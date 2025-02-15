@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { supabase } from "../config/supabaseConfig";
-import { toast } from "react-toastify";
+import { showToast } from "../lib/utils";
 
 type Params = {
   postID: string;
@@ -26,7 +26,9 @@ export default function usePostComment() {
     },
     onError: (error) => {
       if (error) {
-        toast.error(`Error submitting your comment:, ${error.message}`, {
+        showToast({
+          type: "error",
+          message: `Error submitting your comment:, ${error.message}`,
           toastId: "postCommentError",
         });
       }

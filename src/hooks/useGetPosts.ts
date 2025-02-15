@@ -1,47 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../config/supabaseConfig";
 import { z, ZodError } from "zod";
-import { formatTimestamp } from "../lib/utils";
-import { toast } from "react-toastify";
+import { formatTimestamp, showToast } from "../lib/utils";
 import { PostgrestError } from "@supabase/supabase-js";
 import { PostType } from "../lib/types";
+import { PostSchema } from "../lib/schemas";
 
 const defaultName = "Anon";
 const defaultAvatar = "public/anon-user.png";
-
-const PostSchema = z.object({
-  id: z.string(),
-  created_at: z.string(),
-  updated_at: z.nullable(z.string()),
-  created_by_id: z.nullable(z.string()),
-  updated_by_id: z.nullable(z.string()),
-  title: z.nullable(z.string()),
-  description: z.nullable(z.string()),
-  badges: z.nullable(z.array(z.string())), // Shouldn't be nullable and limit ?
-  media_source: z.nullable(z.array(z.string())),
-  media_size: z.nullable(z.number()),
-  media_name: z.nullable(z.string()),
-  media_type: z.nullable(z.string()),
-  profiles: z.object({
-    id: z.string(),
-    avatar_url: z.nullable(z.string()),
-    full_name: z.nullable(z.string()),
-  }),
-  comments: z.array(
-    z.object({
-      content: z.string(),
-      created_at: z.nullable(z.string()),
-      id: z.number(),
-      parent_comment_id: z.nullable(z.string()),
-      user_id: z.string(),
-      profiles: z.object({
-        id: z.string(),
-        avatar_url: z.nullable(z.string()),
-        full_name: z.nullable(z.string()),
-      }),
-    })
-  ),
-});
 
 type PostDBType = z.infer<typeof PostSchema>;
 
@@ -96,13 +62,16 @@ async function fetchPosts(): Promise<PostDBType[] | undefined> {
       });
 
       console.warn("error", error);
-
-      toast.error(`Error was an error retrieving posts:, ${errorMessages}`, {
+      showToast({
+        type: "error",
+        message: `Error was an error retrieving posts:, ${errorMessages}`,
         toastId: "fetchUserPostsError",
       });
     } else {
       const Error = error as PostgrestError;
-      toast.error(`Error was an error retrieving posts:, ${Error.message}`, {
+      showToast({
+        type: "error",
+        message: `Error was an error retrieving posts:, ${Error.message}`,
         toastId: "fetchUserPostsError",
       });
     }
@@ -125,9 +94,9 @@ export default function useGetPosts() {
         description: datum.description,
         badges: datum.badges ?? [],
         mediaSource: datum.media_source ?? [],
-        mediaSize: datum.media_size ?? 0,
-        mediaName: datum.media_name ?? "None",
-        mediaType: datum.media_type ?? "None",
+        mediaSize: datum.media_size ?? [],
+        mediaName: datum.media_name ?? [],
+        mediaType: datum.media_type ?? [],
         mediaUrl: [],
         profile: {
           id: datum.profiles.id,
@@ -160,7 +129,6 @@ export default function useGetPosts() {
               const { data } = await supabase.storage
                 .from("media")
                 .getPublicUrl(path);
-
               return data.publicUrl;
             })
           );
@@ -176,3 +144,10 @@ export default function useGetPosts() {
     },
   });
 }
+
+/*
+Hey friends,
+
+Take a look at Munch Hunt (no its not about Ice Spice HA HA). Its a web application designed to help you narrow down food choices near your area. Sometimes we are just indecisive and don't know what to eat, but this can help you greatly. Munch leverages the power of Yelp Fusion API and Google location services to give you the best food choices near you. You can filter by prices, distance, and ratings and even filter out food choices you simply don't like.
+Let me know what you think 🤓
+*/

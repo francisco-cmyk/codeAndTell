@@ -3,19 +3,20 @@ import { supabase } from "../config/supabaseConfig";
 import { showToast } from "../lib/utils";
 
 type Params = {
-  postID: string;
+  commentID: number;
   userID: string;
+  commentText: string;
 };
 
-export default function useDeletePost() {
+export default function useEditComment() {
   return useMutation({
-    mutationKey: ["deletePost"],
+    mutationKey: ["editComment"],
     mutationFn: async (params: Params) => {
       const { error } = await supabase
-        .from("content")
-        .delete()
-        .eq("id", params.postID)
-        .eq("created_by_id", params.userID);
+        .from("comments")
+        .update({ content: params.commentText })
+        .eq("id", params.commentID)
+        .eq("user_id", params.userID);
 
       if (error) {
         throw new Error(error.message);
@@ -25,16 +26,16 @@ export default function useDeletePost() {
       if (error) {
         showToast({
           type: "error",
-          message: `Error deleting your post:, ${error.message}`,
-          toastId: "deletePostError",
+          message: `Error updating your Comment:, ${error.message}`,
+          toastId: "updateCommentError",
         });
       }
     },
     onSuccess: () => {
       showToast({
         type: "success",
-        message: "Successfully deleted the post",
-        toastId: "deletePostSuccess",
+        message: `Successfully updated the Comment`,
+        toastId: "updateCommentSuccess",
       });
     },
   });

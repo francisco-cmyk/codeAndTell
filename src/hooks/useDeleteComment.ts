@@ -3,18 +3,20 @@ import { supabase } from "../config/supabaseConfig";
 import { showToast } from "../lib/utils";
 
 type Params = {
-  email: string;
-  password: string;
+  commentID: number;
+  userID: string;
 };
 
-export default function useEmailLogin() {
+export default function useDeleteComment() {
   return useMutation({
-    mutationKey: ["signIn"],
+    mutationKey: ["deleteComment"],
     mutationFn: async (params: Params) => {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: params.email,
-        password: params.password,
-      });
+      const { error } = await supabase
+        .from("comments")
+        .delete()
+        .eq("id", params.commentID)
+        .eq("user_id", params.userID);
+
       if (error) {
         throw new Error(error.message);
       }
@@ -23,16 +25,16 @@ export default function useEmailLogin() {
       if (error) {
         showToast({
           type: "error",
-          message: `Error during logging in:, ${error.message}`,
-          toastId: "emailLoginError",
+          message: `Error deleting your Comment:, ${error.message}`,
+          toastId: "deleteCommentError",
         });
       }
     },
     onSuccess: () => {
       showToast({
         type: "success",
-        message: `Login was successful`,
-        toastId: "emailLoginSuccess",
+        message: "Successfully deleted the Comment",
+        toastId: "deleteCommentSuccess",
       });
     },
   });

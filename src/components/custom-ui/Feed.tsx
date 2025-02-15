@@ -18,20 +18,14 @@ import {
   CarouselPrevious,
 } from "../ui-lib/Carousel";
 import { Skeleton } from "../ui-lib/Skeleton";
-import { Trash2, MessageCircle, TriangleAlert } from "lucide-react";
+import { Trash2, MessageCircle, PencilIcon } from "lucide-react";
 import parse from "html-react-parser";
 import { Button } from "../ui-lib/Button";
 import { useAuthContext } from "../../context/auth";
 import useDeletePost from "../../hooks/useDeletePost";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "../ui-lib/Dialog";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import DeleteDialog from "./DeleteDialog";
 
 type FeedProps = {
   isLoading: boolean;
@@ -39,6 +33,7 @@ type FeedProps = {
   isUserPost?: boolean;
   onSelect?: (postID: string) => void;
   onCommentSelect?: (postID: string) => void;
+  onPostEdit?: (postID: string) => void;
 };
 
 export default function Feed(props: FeedProps) {
@@ -75,6 +70,12 @@ export default function Feed(props: FeedProps) {
     }
   }
 
+  function handlePostEdit(id: string) {
+    if (props.onPostEdit) {
+      props.onPostEdit(id);
+    }
+  }
+
   function handleDeletePost() {
     if (!deletePostID) return;
 
@@ -96,7 +97,7 @@ export default function Feed(props: FeedProps) {
     <div
       className={`min-w-[700px] max-w-3xl h-full grid grid-cols-1 gap-y-12 p-3 pb-44 place-self-center overflow-y-auto no-scrollbar`}
     >
-      <DeletePostDialog
+      <DeleteDialog
         isOpen={!!deletePostID}
         handleDelete={handleDeletePost}
         onClose={() => setDeletePostID(null)}
@@ -136,10 +137,10 @@ export default function Feed(props: FeedProps) {
                 </CardDescription>
               </CardHeader>
               <CardContent
-                className='relative w-full p-1 mx-auto overflow-hidden rounded-lg'
+                className='relative w-full p-1 mx-auto overflow-hidden '
                 onClick={(e) => e.stopPropagation()}
               >
-                <Carousel className='w-full mx-auto rounded-lg'>
+                <Carousel className='w-full mx-auto'>
                   <CarouselContent>
                     {post.mediaUrl.map((image, index) => (
                       <CarouselItem
@@ -147,9 +148,9 @@ export default function Feed(props: FeedProps) {
                         className='relative w-full flex justify-center items-center p-2 rounded-lg'
                       >
                         <BackgroundImage image={image} />
-                        <div className='relative w-full max-h-[500px] flex justify-center items-center overflow-hidden'>
+                        <div className='relative w-full max-h-[500px] flex justify-center items-center overflow-hidden pl-4'>
                           <img
-                            className=' max-h-[500px] object-contain rounded-lg'
+                            className=' max-h-[500px] object-contain rounded-md'
                             src={image}
                           />
                         </div>
@@ -193,58 +194,34 @@ export default function Feed(props: FeedProps) {
                   </Button>
 
                   {isUserPost && (
-                    <Button
-                      variant='ghost'
-                      className='w-7 outline-non ml-3 '
-                      onClick={() => setDeletePostID(post.id)}
-                    >
-                      <Trash2 />
-                    </Button>
+                    <>
+                      <Button
+                        variant='ghost'
+                        className='w-7 outline-non ml-3 '
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handlePostEdit(post.id);
+                        }}
+                      >
+                        <PencilIcon />
+                      </Button>
+                      <Button
+                        variant='ghost'
+                        className='w-7 outline-non ml-3 '
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDeletePostID(post.id);
+                        }}
+                      >
+                        <Trash2 />
+                      </Button>
+                    </>
                   )}
                 </div>
               </CardFooter>
             </Card>
           ))}
     </div>
-  );
-}
-
-type DeleteDialogProp = {
-  isOpen: boolean;
-  handleDelete: () => void;
-  onClose: () => void;
-};
-
-function DeletePostDialog(props: DeleteDialogProp) {
-  return (
-    <Dialog open={props.isOpen} onOpenChange={props.onClose}>
-      <DialogContent
-        className='max-w-96'
-        aria-describedby='Warning modal for deleting post action'
-      >
-        <DialogHeader>
-          <DialogTitle className='w-full flex justify-center mb-3'>
-            <TriangleAlert className='text-red-400' />
-          </DialogTitle>
-          <DialogTitle>Are you super duper sure?</DialogTitle>
-        </DialogHeader>
-        <DialogDescription>
-          <p className='text-xs'>
-            This will permanently delete this post. Once deleted your post will
-            be gone forever.
-          </p>
-        </DialogDescription>
-
-        <div className='w-full flex justify-between mt-4'>
-          <Button variant='outline' onClick={props.onClose}>
-            cancel
-          </Button>
-          <Button variant='destructive' onClick={props.handleDelete}>
-            delete
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
   );
 }
 
