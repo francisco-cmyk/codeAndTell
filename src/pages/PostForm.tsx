@@ -9,6 +9,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "../components/ui-lib/Form";
 import { Input } from "../components/ui-lib/Input";
 import { MultiSelect } from "../components/ui-lib/MultiSelect";
@@ -34,7 +35,9 @@ export default function PostForm() {
   const formSchema = z.object({
     title: z.string().min(2).max(50),
     description: z.string().min(2).max(300),
-    badges: z.string().array().min(1).max(3),
+    badges: z.string().array().min(1).max(3, {
+      message: "You can only select up to 3 badges."
+    }),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -90,7 +93,7 @@ export default function PostForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Title</FormLabel>
-                  <FormDescription>make it catchy!</FormDescription>
+                  <FormDescription>make it catchy.</FormDescription>
                   <FormControl>
                     <Input placeholder='' {...field} />
                   </FormControl>
@@ -122,6 +125,7 @@ export default function PostForm() {
               render={() => (
                 <FormItem>
                   <FormLabel>Badges</FormLabel>
+                  <FormMessage />
                   <MultiSelect
                     options={tagList}
                     onValueChange={(value) => {

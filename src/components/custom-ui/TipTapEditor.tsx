@@ -185,7 +185,7 @@ export default function TiptapEditor(props: EditorProps) {
               placeholder='enter link url'
               value={url}
               onChange={(e) => {
-                e.preventDefault(), setUrl(e.target.value);
+                e.preventDefault(); setUrl(e.target.value);
               }}
             />
 
