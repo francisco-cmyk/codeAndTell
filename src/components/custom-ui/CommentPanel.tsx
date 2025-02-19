@@ -2,10 +2,9 @@ import { useState } from "react";
 import { PostType } from "../../lib/types";
 import { Separator } from "../ui-lib/Separator";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui-lib/Avatar";
-import { createAcronym } from "../../lib/utils";
+import { createAcronym, showToast } from "../../lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthContext } from "../../context/auth";
-import { toast } from "react-toastify";
 import usePostComment from "../../hooks/usePostComment";
 import parse from "html-react-parser";
 import TiptapEditor from "./TipTapEditor";
@@ -26,7 +25,9 @@ export default function Comments(props: PostViewProps) {
 
   function handleSubmitComment() {
     if (!comment.trim()) {
-      toast.error(`Cannot submit empty comments, please add text.`, {
+      showToast({
+        type: "error",
+        message: "Cannot submit empty comments, please add text.",
         toastId: "emptyCommentError",
       });
       return;
@@ -64,7 +65,7 @@ export default function Comments(props: PostViewProps) {
         <div className='flex flex-col'>
           <div className='w-full flex flex-col '>
             <p className='font-semibold text-xl'>{props.post.title}</p>
-            <p className='text-sm mt-1 overflow-hidden text-ellipsis'>
+            <p className='text-sm mt-1 line-clamp-4'>
               {parse(props.post.description ?? "")}
             </p>
             <span className='text-xs text-right font-semibold'>{`by ${props.post.profile.name}`}</span>

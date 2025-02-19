@@ -7,10 +7,17 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui-lib/Popover";
 import { Input } from "../ui-lib/Input";
 import { Button } from "../ui-lib/Button";
 import { useAuthContext } from "../../context/auth";
+import Document from '@tiptap/extension-document';
+import Paragraph from '@tiptap/extension-paragraph';
+import Text from '@tiptap/extension-text';
+import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
+import { all, createLowlight } from 'lowlight';
+
+const lowlight = createLowlight(all);
 
 const ToolbarType = {
   bold: "bold",
-  code: "code",
+  codeBlock: "codeBlock",
   italic: "italic",
   link: "link",
   strike: "strike",
@@ -30,12 +37,12 @@ type EditorProps = {
   value?: string;
   variant?: VariantType;
   showSubmit?: boolean;
-  onChange: (content: string) => void;
-  onSubmit?: () => void;
+  onChange?: (content: string) => void;
+  onSubmit?: (content?: string) => void;
 };
 export default function TiptapEditor(props: EditorProps) {
   const { isAuthenticated } = useAuthContext();
-  const [content, setContent] = useState(props.value ?? "");
+  const [content, setContent] = useState("");
   const [url, setUrl] = useState("");
 
   const variant = props.variant ? Variant[props.variant] : Variant.big;
@@ -49,18 +56,33 @@ export default function TiptapEditor(props: EditorProps) {
         linkOnPaste: true,
         defaultProtocol: "https",
       }),
+      Document,
+      Paragraph,
+      Text,
+      CodeBlockLowlight.configure({
+        lowlight,
+      }),
     ],
     content,
     onUpdate: ({ editor }) => {
       const html = editor.getHTML();
       setContent(html);
-      props.onChange(html);
+      if (props.onChange) {
+        props.onChange(html);
+      }
     },
   });
 
   useEffect(() => {
     return () => editor?.destroy();
   }, [editor]);
+
+  useEffect(() => {
+    if (!editor) return;
+    if (!content && props.value) {
+      editor.commands.setContent(props.value);
+    }
+  }, [props.value, editor]);
 
   function setLink() {
     if (!editor) return;
@@ -91,8 +113,8 @@ export default function TiptapEditor(props: EditorProps) {
         editor.chain().focus().toggleBold().run();
         return;
       }
-      case ToolbarType.code: {
-        editor.chain().focus().setCode().run();
+      case ToolbarType.codeBlock: {
+        editor.chain().focus().toggleCodeBlock().run();
         return;
       }
       case ToolbarType.italic: {
@@ -117,7 +139,7 @@ export default function TiptapEditor(props: EditorProps) {
 
     if (!editor) return;
     if (props.onSubmit) {
-      props.onSubmit();
+      props.onSubmit(content);
       editor.commands.setContent("");
     }
   }
@@ -162,11 +184,11 @@ export default function TiptapEditor(props: EditorProps) {
           <Strikethrough size={15} />
         </button>
         <button
-          disabled={editor.isActive("code")}
+          disabled={editor.isActive("codeBlock")}
           className={`p-1 ${
-            editor.isActive("code") ? "bg-gray-300 dark:bg-zinc-700" : ""
+            editor.isActive("codeBlock") ? "bg-gray-300 dark:bg-zinc-700" : ""
           }`}
-          onClick={(event) => handleToolbarClick(event, ToolbarType.code)}
+          onClick={(event) => handleToolbarClick(event, ToolbarType.codeBlock)}
         >
           <Code size={15} />
         </button>

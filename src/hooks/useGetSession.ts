@@ -1,7 +1,7 @@
 import { Session } from "@supabase/supabase-js";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../config/supabaseConfig";
-import { toast } from "react-toastify";
+import { showToast } from "../lib/utils";
 
 export default function useGetSession() {
   return useQuery<Session | null, Error>({
@@ -13,7 +13,9 @@ export default function useGetSession() {
       } = await supabase.auth.getSession();
 
       if (sessionError) {
-        toast.error(`Error fetching session:, ${sessionError.message}`, {
+        showToast({
+          type: "error",
+          message: `Error fetching session:, ${sessionError.message}`,
           toastId: "fetchSession",
         });
       }
