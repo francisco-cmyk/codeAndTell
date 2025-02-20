@@ -3,7 +3,7 @@ import { supabase } from "../config/supabaseConfig";
 import { z, ZodError } from "zod";
 import { formatTimestamp, showToast } from "../lib/utils";
 import { PostgrestError } from "@supabase/supabase-js";
-import { PostType } from "../lib/types";
+import { MediaType, PostType } from "../lib/types";
 import { PostSchema } from "../lib/schemas";
 
 const defaultName = "Anon";
@@ -93,11 +93,7 @@ export default function useGetPosts() {
         title: datum.title,
         description: datum.description,
         badges: datum.badges ?? [],
-        mediaSource: datum.media_source ?? [],
-        mediaSize: datum.media_size ?? [],
-        mediaName: datum.media_name ?? [],
-        mediaType: datum.media_type ?? [],
-        mediaUrl: [],
+        media: [],
         profile: {
           id: datum.profiles.id,
           avatarURL: datum.profiles.avatar_url ?? defaultAvatar,
@@ -117,15 +113,35 @@ export default function useGetPosts() {
         })),
       }));
 
+      const mediaByPostId: Map<string, MediaType[]> = new Map();
+
+      (data ?? []).forEach((datum) => {
+        const { media_source, media_size, media_name, media_type, id } = datum;
+
+        if (!media_source) return;
+
+        const mediaItems = media_source.map((source, index) => ({
+          mediaSource: source ?? "",
+          mediaSize: media_size?.[index] ?? 0,
+          mediaName: media_name?.[index] ?? "",
+          mediaType: media_type?.[index] ?? "",
+          mediaUrl: "",
+        }));
+
+        mediaByPostId.set(id, mediaItems);
+      });
+
       const postsWithMedia = await Promise.all(
         posts.map(async (post) => {
-          if (!post.mediaSource) {
-            return { ...post, mediaUrl: [] };
+          const mediaForPost = mediaByPostId.get(post.id) || [];
+
+          if (mediaForPost.length === 0) {
+            return { ...post, media: [] };
           }
 
           const publicUrls = await Promise.all(
-            post.mediaSource.map(async (path) => {
-              path = path.trim().toLowerCase();
+            mediaForPost.map(async (mediaItem) => {
+              const path = mediaItem.mediaSource.trim().toLowerCase();
               const { data } = await supabase.storage
                 .from("media")
                 .getPublicUrl(path);
@@ -133,10 +149,12 @@ export default function useGetPosts() {
             })
           );
 
-          return {
-            ...post,
-            mediaUrl: publicUrls,
-          };
+          const updatedMedia = mediaForPost.map((mediaItem, index) => ({
+            ...mediaItem,
+            mediaUrl: publicUrls[index],
+          }));
+
+          return { ...post, media: updatedMedia };
         })
       );
 
@@ -144,10 +162,3 @@ export default function useGetPosts() {
     },
   });
 }
-
-/*
-Hey friends,
-
-Take a look at Munch Hunt (no its not about Ice Spice HA HA). Its a web application designed to help you narrow down food choices near your area. Sometimes we are just indecisive and don't know what to eat, but this can help you greatly. Munch leverages the power of Yelp Fusion API and Google location services to give you the best food choices near you. You can filter by prices, distance, and ratings and even filter out food choices you simply don't like.
-Let me know what you think 🤓
-*/

@@ -1,5 +1,5 @@
 import { PostType } from "../../lib/types";
-import { createAcronym } from "../../lib/utils";
+import { createAcronym, getEmbedURL } from "../../lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui-lib/Avatar";
 import { Badge } from "../ui-lib/Badge";
 import {
@@ -142,22 +142,54 @@ export default function Feed(props: FeedProps) {
               >
                 <Carousel className='w-full mx-auto'>
                   <CarouselContent>
-                    {post.mediaUrl.map((image, index) => (
-                      <CarouselItem
-                        key={`${image}-${index}`}
-                        className='relative w-full flex justify-center items-center p-2 rounded-lg'
-                      >
-                        <BackgroundImage image={image} />
-                        <div className='relative w-full max-h-[500px] flex justify-center items-center overflow-hidden pl-4'>
-                          <img
-                            className=' max-h-[500px] object-contain rounded-md'
-                            src={image}
-                          />
-                        </div>
-                      </CarouselItem>
-                    ))}
+                    {post.media.map((mediaFile, index) => {
+                      const isImage = mediaFile.mediaType
+                        ? mediaFile.mediaType.includes("image/")
+                        : false;
+                      const isVideo = mediaFile.mediaType
+                        ? mediaFile.mediaType.includes("video/")
+                        : false;
+
+                      return (
+                        <CarouselItem
+                          key={`${mediaFile.mediaName}-${index}`}
+                          className='relative w-full flex justify-center items-center p-2 rounded-lg'
+                        >
+                          {isImage && (
+                            <>
+                              <BackgroundImage image={mediaFile.mediaUrl} />
+                              <div className='relative w-full max-h-[500px] flex justify-center items-center overflow-hidden pl-4'>
+                                <img
+                                  className=' max-h-[500px] object-contain rounded-md'
+                                  src={mediaFile.mediaUrl}
+                                />
+                              </div>
+                            </>
+                          )}
+                          {isVideo && (
+                            <div className='w-full h-96 rounded-lg overflow-hidden pt-2'>
+                              {mediaFile.mediaSource.includes("youtube.com") ||
+                              mediaFile.mediaSource.includes("vimeo.com") ? (
+                                <iframe
+                                  src={getEmbedURL(mediaFile.mediaSource)}
+                                  allowFullScreen
+                                  className=' inset-0 w-full h-full'
+                                  loading='lazy'
+                                />
+                              ) : (
+                                <video
+                                  src={mediaFile.mediaSource}
+                                  controls
+                                  className='w-full h-auto rounded-lg shadow-md'
+                                />
+                              )}
+                            </div>
+                          )}
+                        </CarouselItem>
+                      );
+                    })}
                   </CarouselContent>
-                  {post.mediaSource.length > 1 && (
+                  {post.media.length > 1 && (
                     <>
                       <CarouselPrevious className='left-1' />
                       <CarouselNext className='right-1' />
