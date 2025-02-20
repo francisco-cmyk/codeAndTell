@@ -8,6 +8,7 @@ import { useAuthContext } from "../../context/auth";
 import usePostComment from "../../hooks/usePostComment";
 import parse from "html-react-parser";
 import TiptapEditor from "./TipTapEditor";
+import { htmlParser } from "../../lib/parser";
 
 type PostViewProps = {
   post: PostType;
@@ -66,9 +67,9 @@ export default function Comments(props: PostViewProps) {
           <div className='w-full flex flex-col '>
             <p className='font-semibold text-xl'>{props.post.title}</p>
             <p className='text-sm mt-1 line-clamp-4'>
-              {parse(props.post.description ?? "")}
+              {htmlParser(props.post.description)}
             </p>
-            <span className='text-xs text-right font-semibold'>{`by ${props.post.profile.name}`}</span>
+            <p className='text-xs text-right font-semibold'>{`by ${props.post.profile.name}`}</p>
             <Separator className='mb-5 mt-2' />
           </div>
 
@@ -93,9 +94,7 @@ export default function Comments(props: PostViewProps) {
                       <p className='text-xs mb-2'>{comment.profile.name}</p>
                     </div>
                     <p className='pl-2 pb-2'>{parse(comment.content)}</p>
-                    <span className='text-xs text-right'>
-                      {comment.createdAt}
-                    </span>
+                    <p className='text-xs text-right'>{comment.createdAt}</p>
                     <Separator className='mt-2 ' />
                   </div>
                 ))

@@ -22,12 +22,14 @@ import { MediaPayload } from "../lib/types";
 import useGetUserPostByID from "../hooks/useGetPostByID";
 import useUploadMedia from "../hooks/useUploadMedia";
 import { useQueryClient } from "@tanstack/react-query";
+import PostView from "../components/custom-ui/PostView";
 
 const View = {
-  posts: "posts",
   comments: "comments",
-  tags: "tags",
   edit: "edit",
+  post: "post",
+  posts: "posts",
+  tags: "tags",
 } as const;
 
 type View = keyof typeof View;
@@ -96,6 +98,11 @@ export default function UserPosts() {
   function handleSelectedComments(id: string) {
     setSearchParams({ tab: View.comments, postID: id });
   }
+
+  function handlePostSelect(id: string) {
+    setSearchParams({ tab: View.post, postID: id });
+  }
+
   function handleSelectEditPost(id: string) {
     setSearchParams({ tab: View.edit, postID: id });
   }
@@ -110,7 +117,7 @@ export default function UserPosts() {
   async function handleSubmitEditPost(values: z.infer<typeof formSchema>) {
     if (!selectedPostIDSearchParam || !post) return;
 
-    let uploadedUrls: string[] = post.mediaSource || [];
+    let uploadedUrls: string[] = post.media.map((item) => item.mediaUrl) || [];
 
     const media: MediaPayload = {
       mediaType: null,
@@ -121,7 +128,8 @@ export default function UserPosts() {
 
     let mediaValues = values.media; //Base changes on this var
     const mediaNames = mediaValues.map((media) => media.name);
-    const { added, removed } = getArrayDiff(post.mediaName, mediaNames);
+    const postMediaNames = post.media.map((item) => item.mediaName);
+    const { added, removed } = getArrayDiff(postMediaNames, mediaNames);
 
     //1. ** Handle removed files **
     if (removed.length > 0) {
@@ -182,10 +190,17 @@ export default function UserPosts() {
             posts={posts}
             isLoading={isLoadingPosts}
             onCommentSelect={handleSelectedComments}
+            onSelect={handlePostSelect}
             onPostEdit={handleSelectEditPost}
             isUserPost
           />
         );
+      }
+      case View.post: {
+        if (!searchParams.has("postID")) {
+          return null;
+        }
+        return <PostView />;
       }
       case View.comments: {
         return (

@@ -7,11 +7,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui-lib/Popover";
 import { Input } from "../ui-lib/Input";
 import { Button } from "../ui-lib/Button";
 import { useAuthContext } from "../../context/auth";
-import Document from '@tiptap/extension-document';
-import Paragraph from '@tiptap/extension-paragraph';
-import Text from '@tiptap/extension-text';
-import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
-import { all, createLowlight } from 'lowlight';
+import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
+import { all, createLowlight } from "lowlight";
 
 const lowlight = createLowlight(all);
 
@@ -42,8 +39,8 @@ type EditorProps = {
 };
 export default function TiptapEditor(props: EditorProps) {
   const { isAuthenticated } = useAuthContext();
-  const [content, setContent] = useState("");
-  const [url, setUrl] = useState("");
+  const [content, setContent] = useState<string>("");
+  const [url, setUrl] = useState<string>("");
 
   const variant = props.variant ? Variant[props.variant] : Variant.big;
 
@@ -58,9 +55,6 @@ export default function TiptapEditor(props: EditorProps) {
         linkOnPaste: true,
         defaultProtocol: "https",
       }),
-      Document,
-      Paragraph,
-      Text,
       CodeBlockLowlight.configure({
         lowlight: lowlight,
       }),
@@ -159,7 +153,7 @@ export default function TiptapEditor(props: EditorProps) {
   if (!editor) return null;
 
   return (
-    <div className='p-2 border w-full rounded-lg shadow-md min-h-36 max-h-96 overflow-y-auto'>
+    <div className='p-2 border-2 w-full rounded-lg min-h-36 max-h-96 overflow-y-auto'>
       <div className='flex gap-2 mb-1 border-b pb-1'>
         <button
           className={`p-1 ${
@@ -190,7 +184,10 @@ export default function TiptapEditor(props: EditorProps) {
           className={`p-1 ${
             editor.isActive("codeBlock") ? "bg-gray-300 dark:bg-zinc-700" : ""
           }`}
-          onClick={(e) => { e.preventDefault(); editor.chain().focus().toggleCodeBlock().run(); }}
+          onClick={(e) => {
+            e.preventDefault();
+            editor.chain().focus().toggleCodeBlock().run();
+          }}
         >
           <Code size={15} />
         </button>
@@ -209,7 +206,8 @@ export default function TiptapEditor(props: EditorProps) {
               placeholder='enter link url'
               value={url}
               onChange={(e) => {
-                e.preventDefault(); setUrl(e.target.value);
+                e.preventDefault();
+                setUrl(e.target.value);
               }}
             />
 

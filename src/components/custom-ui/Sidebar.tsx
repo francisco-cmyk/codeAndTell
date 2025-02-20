@@ -12,7 +12,7 @@ export default function Sidebar() {
           <Button onClick={() => navigate("/newPost")}> new + </Button>
           <div className='grid grid-flow-row auto-rows-max gap-0.5 text- mt-2'>
             <Link
-              to='/'
+              to='/feed'
               className={`${
                 pathname === "/" ? "bg-slate-200 dark:bg-accent" : ""
               } group flex h-8 w-full items-center rounded-lg px-2 font-normal text-foreground underline-offset-2 hover:bg-slate-200 dark:hover:bg-accent hover:text-accent-foreground`}

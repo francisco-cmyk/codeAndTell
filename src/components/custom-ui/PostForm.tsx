@@ -88,7 +88,9 @@ export default function PostForm({ post, onSubmit }: FormProps) {
       }
 
       const files = await Promise.all(
-        post.mediaUrl.map((url, index) => urlToFile(url, post.mediaName[index]))
+        post.media.map((mediaItem) =>
+          urlToFile(mediaItem.mediaUrl, mediaItem.mediaName)
+        )
       );
 
       reset((prevValues) => ({

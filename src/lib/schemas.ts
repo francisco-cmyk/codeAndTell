@@ -1,20 +1,5 @@
 import { z } from "zod";
 
-export const SinglePostSchema = z.object({
-  id: z.string(),
-  created_at: z.string(),
-  updated_at: z.nullable(z.string()),
-  created_by_id: z.string(),
-  updated_by_id: z.nullable(z.string()),
-  title: z.string(),
-  description: z.string(),
-  badges: z.array(z.string()),
-  media_source: z.nullable(z.array(z.string())),
-  media_size: z.nullable(z.array(z.number())),
-  media_name: z.nullable(z.array(z.string())),
-  media_type: z.nullable(z.array(z.string())),
-});
-
 export const PostSchema = z.object({
   id: z.string(),
   created_at: z.string(),
