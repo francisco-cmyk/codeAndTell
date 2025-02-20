@@ -2,6 +2,7 @@ import { PostType } from "../../lib/types";
 import { createAcronym, getEmbedURL } from "../../lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui-lib/Avatar";
 import { Badge } from "../ui-lib/Badge";
+import { all, createLowlight } from 'lowlight';
 import {
   Card,
   CardContent,
@@ -20,6 +21,7 @@ import {
 import { Skeleton } from "../ui-lib/Skeleton";
 import { Trash2, MessageCircle, PencilIcon } from "lucide-react";
 import parse from "html-react-parser";
+import { Element, Text } from "html-react-parser";
 import { Button } from "../ui-lib/Button";
 import { useAuthContext } from "../../context/auth";
 import useDeletePost from "../../hooks/useDeletePost";
@@ -93,6 +95,34 @@ export default function Feed(props: FeedProps) {
     );
   }
 
+  const lowlight = createLowlight(all)
+
+  const options = {
+    replace: (domNode) => {
+      if (domNode instanceof Element && domNode.tagName === "code") {
+        const className = domNode.attribs?.className || "";
+        const languageMatch = className.match(/language-(\w+)/);
+        const language = languageMatch ? languageMatch[1] : "plaintext";
+        console.log("THIS IS LANGUAGE:", language);
+
+        if (lowlight.listLanguages().includes(language)) {
+          const textContent = domNode.children
+          .map((child) => (child instanceof Text ? child.data : "")) // `text` is the correct property
+          .join("");
+
+          const highlighted = lowlight.highlight(language, textContent);
+          console.log("THIS IS HIGHLIGHTED:", highlighted);
+          return (
+            <code
+              className={`language-${language} hljs`}
+              dangerouslySetInnerHTML={{ __html: highlighted.children[0].value }}
+            />
+          );
+        }
+      }
+    },
+  };
+
   return (
     <div
       className={`min-w-[700px] max-w-3xl h-full grid grid-cols-1 gap-y-12 p-3 pb-44 place-self-center overflow-y-auto no-scrollbar`}
@@ -133,7 +163,7 @@ export default function Feed(props: FeedProps) {
                   <p>{post.createdAt}</p>
                 </CardDescription>
                 <CardDescription className={`dark:text-slate-50`}>
-                  {parse(post.description ?? "")}
+                  {parse(post.description ?? "", options)}
                 </CardDescription>
               </CardHeader>
               <CardContent

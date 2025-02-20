@@ -49,7 +49,9 @@ export default function TiptapEditor(props: EditorProps) {
 
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        codeBlock: false,
+      }),
       Link.configure({
         openOnClick: true,
         autolink: true,
@@ -60,7 +62,7 @@ export default function TiptapEditor(props: EditorProps) {
       Paragraph,
       Text,
       CodeBlockLowlight.configure({
-        lowlight,
+        lowlight: lowlight,
       }),
     ],
     content,
@@ -113,10 +115,10 @@ export default function TiptapEditor(props: EditorProps) {
         editor.chain().focus().toggleBold().run();
         return;
       }
-      case ToolbarType.codeBlock: {
-        editor.chain().focus().toggleCodeBlock().run();
-        return;
-      }
+      // case ToolbarType.codeBlock: {
+      //   editor.chain().focus().toggleCodeBlock().run();
+      //   return;
+      // }
       case ToolbarType.italic: {
         editor.chain().focus().toggleItalic().run();
         return;
@@ -188,7 +190,7 @@ export default function TiptapEditor(props: EditorProps) {
           className={`p-1 ${
             editor.isActive("codeBlock") ? "bg-gray-300 dark:bg-zinc-700" : ""
           }`}
-          onClick={(event) => handleToolbarClick(event, ToolbarType.codeBlock)}
+          onClick={(e) => { e.preventDefault(); editor.chain().focus().toggleCodeBlock().run(); }}
         >
           <Code size={15} />
         </button>

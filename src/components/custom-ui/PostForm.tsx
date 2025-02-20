@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { getEmbedURL, showToast, urlToFile } from "../../lib/utils";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../ui-lib/Tabs";
 import { Button } from "../ui-lib/Button";
+import { Checkbox } from "../ui-lib/Checkbox";
 import {
   FormField,
   FormItem,
