@@ -54,13 +54,14 @@ export default function useEditPost() {
         }
       );
 
-      console.log(updatedPost);
-
-      const { error } = await supabase.from("content").update({
-        ...updatedPost,
-        updated_at: new Date().toISOString(),
-        updated_by_id: params.userID,
-      });
+      const { error } = await supabase
+        .from("content")
+        .update({
+          ...updatedPost,
+          updated_at: new Date().toISOString(),
+          updated_by_id: params.userID,
+        })
+        .eq("id", params.postID);
 
       if (error) {
         throw new Error(error.message);
@@ -70,14 +71,14 @@ export default function useEditPost() {
       console.warn("error", error);
       showToast({
         type: "error",
-        message: `Error submitting your post:, ${error.message}`,
+        message: `Error submitting your post edit:, ${error.message}`,
         toastId: "editPostError",
       });
     },
     onSuccess: () => {
       showToast({
         type: "success",
-        message: `Successfully created post!`,
+        message: `Successfully edited post!`,
         toastId: "editPostSuccess",
       });
     },

@@ -110,6 +110,16 @@ export function getDiff<T extends Record<string, any>>(
   }, {} as Partial<T>);
 }
 
+// Diff array of primitives (not objects)
+export function getArrayDiff<T>(
+  original: T[],
+  updated: T[]
+): { added: T[]; removed: T[] } {
+  const added = updated.filter((item) => !original.includes(item));
+  const removed = original.filter((item) => !updated.includes(item));
+  return { added, removed };
+}
+
 //
 // File Objects
 //
@@ -120,4 +130,55 @@ export async function urlToFile(url: string, fileName: string): Promise<File> {
   const mimeType = blob.type;
 
   return new File([blob], fileName, { type: mimeType });
+}
+
+//
+// Video Link Format
+//
+
+export function getLinkType(link: string): string {
+  let type;
+
+  if (link.includes("youtube.com") || link.includes("youtu.be")) {
+    // youtu.be is shortened version
+    type = "video/youtube";
+  } else if (link.includes("vimeo.com")) {
+    type = "video/vimeo";
+  } else {
+    // Extract file extension
+    const extensionMatch = link.match(
+      /\.(mp4|mov|avi|wmv|flv|webm|mkv)(\?|$)/i
+    );
+
+    if (extensionMatch) {
+      type = `video/${extensionMatch[1].toLowerCase()}`;
+    } else if (link.includes("dailymotion.com")) {
+      type = "video/dailymotion";
+    } else if (link.includes("tiktok.com")) {
+      type = "video/tiktok";
+    } else if (link.includes("facebook.com") || link.includes("fb.watch")) {
+      type = "video/facebook";
+    } else {
+      type = "video/unknown"; // Default for unknown sources
+    }
+  }
+
+  return type;
+}
+
+export function getEmbedURL(url: string) {
+  const youtubeRegex =
+    /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/;
+  const vimeoRegex = /vimeo\.com\/(\d+)/;
+
+  const youtubeMatch = url.match(youtubeRegex);
+  const vimeoMatch = url.match(vimeoRegex);
+
+  if (youtubeMatch) {
+    return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
+  } else if (vimeoMatch) {
+    return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+  }
+
+  return url;
 }

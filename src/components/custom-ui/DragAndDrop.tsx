@@ -113,10 +113,10 @@ export default function DragAndDrop(props: DragAndDropProps) {
                   <img
                     src={URL.createObjectURL(file)}
                     alt={file.name}
-                    className='w-24 h-24 object-cover rounded-lg'
+                    className='w-32 h-24 object-cover rounded-lg'
                   />
                 ) : (
-                  <video className='w-24 h-24 rounded-lg' controls>
+                  <video className='w-32 h-24 rounded-lg' controls>
                     <source src={URL.createObjectURL(file)} type={file.type} />
                   </video>
                 )}

@@ -89,7 +89,7 @@ export default function useGetUserPostByID(params: Params) {
         updatedById: data.updated_by_id,
         title: data.title,
         description: data.description,
-        badges: data.badges ?? [],
+        badges: data.badges,
         mediaSource: data.media_source ?? [],
         mediaSize: data.media_size ?? [],
         mediaName: data.media_name ?? [],
