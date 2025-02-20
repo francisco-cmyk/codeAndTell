@@ -1,4 +1,5 @@
 import {
+  ChevronLeft,
   ChevronRight,
   EllipsisIcon,
   PencilIcon,
@@ -57,6 +58,12 @@ export default function CommentsSection(props: CommentSectionProps) {
   function removeSearchParam() {
     const newParams = new URLSearchParams(searchParams);
     newParams.delete("postID");
+    setSearchParams(newParams, { replace: true });
+  }
+
+  function returnToPosts() {
+    const newParams = new URLSearchParams();
+    newParams.set("tab", "posts");
     setSearchParams(newParams, { replace: true });
   }
 
@@ -134,9 +141,18 @@ export default function CommentsSection(props: CommentSectionProps) {
         handleSubmitEdit={handleEditComment}
         onClose={() => setSelectEditCommentID(null)}
       />
-      <div className={`${isSelectPost ? "flex" : "hidden"} w-full justify-end`}>
+      <div
+        className={`${isSelectPost ? "flex" : "hidden"} w-full justify-between`}
+      >
         <div
-          className='w-48 text-xs flex items-center dark:hover:bg-zinc-700 hover:bg-zinc-400 mb-2 p-2 rounded-lg'
+          className='text-xs flex items-center dark:hover:bg-zinc-700 hover:bg-zinc-400 mb-2 p-2 rounded-lg'
+          onClick={returnToPosts}
+        >
+          <ChevronLeft size={15} />
+          <p>go back to posts</p>
+        </div>
+        <div
+          className=' text-xs flex items-center dark:hover:bg-zinc-700 hover:bg-zinc-400 mb-2 p-2 rounded-lg'
           onClick={removeSearchParam}
         >
           <p>go back to all comments</p>

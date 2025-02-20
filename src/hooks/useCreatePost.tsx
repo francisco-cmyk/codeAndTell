@@ -13,7 +13,7 @@ type Params = {
   mediaSource: string[] | null;
 };
 
-export default function useNewPost() {
+export default function useCreatePost() {
   return useMutation({
     mutationKey: ["newPost"],
     mutationFn: async (params: Params) => {

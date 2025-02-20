@@ -3,7 +3,7 @@ import { supabase } from "../config/supabaseConfig";
 import { z, ZodError } from "zod";
 import { formatTimestamp, showToast } from "../lib/utils";
 import { PostgrestError } from "@supabase/supabase-js";
-import { PostType } from "../lib/types";
+import { MediaType, PostType } from "../lib/types";
 import { PostSchema } from "../lib/schemas";
 
 const defaultName = "Anon";
@@ -99,11 +99,7 @@ export default function useGetUserPosts(params: Params) {
         title: datum.title,
         description: datum.description,
         badges: datum.badges ?? [],
-        mediaSource: datum.media_source ?? [],
-        mediaSize: datum.media_size ?? [],
-        mediaName: datum.media_name ?? [],
-        mediaType: datum.media_type ?? [],
-        mediaUrl: [],
+        media: [],
         profile: {
           id: datum.profiles.id,
           avatarURL: datum.profiles.avatar_url ?? defaultAvatar,
@@ -123,27 +119,48 @@ export default function useGetUserPosts(params: Params) {
         })),
       }));
 
+      const mediaByPostId: Map<string, MediaType[]> = new Map();
+
+      (data ?? []).forEach((datum) => {
+        const { media_source, media_size, media_name, media_type, id } = datum;
+
+        if (!media_source) return;
+
+        const mediaItems = media_source.map((source, index) => ({
+          mediaSource: source ?? "",
+          mediaSize: media_size?.[index] ?? 0,
+          mediaName: media_name?.[index] ?? "",
+          mediaType: media_type?.[index] ?? "",
+          mediaUrl: "",
+        }));
+
+        mediaByPostId.set(id, mediaItems);
+      });
+
       const postsWithMedia = await Promise.all(
         posts.map(async (post) => {
-          if (!post.mediaSource) {
-            return { ...post, mediaUrl: [] };
+          const mediaForPost = mediaByPostId.get(post.id) || [];
+
+          if (mediaForPost.length === 0) {
+            return { ...post, media: [] };
           }
 
           const publicUrls = await Promise.all(
-            post.mediaSource.map(async (path) => {
-              path = path.trim().toLowerCase();
+            mediaForPost.map(async (mediaItem) => {
+              const path = mediaItem.mediaSource.trim().toLowerCase();
               const { data } = await supabase.storage
                 .from("media")
                 .getPublicUrl(path);
-
               return data.publicUrl;
             })
           );
 
-          return {
-            ...post,
-            mediaUrl: publicUrls,
-          };
+          const updatedMedia = mediaForPost.map((mediaItem, index) => ({
+            ...mediaItem,
+            mediaUrl: publicUrls[index],
+          }));
+
+          return { ...post, media: updatedMedia };
         })
       );
 

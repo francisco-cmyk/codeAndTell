@@ -1,18 +1,19 @@
 import { z } from "zod";
 import { useAuthContext } from "../context/auth";
 import { useNavigate } from "react-router-dom";
-import useNewPost from "../hooks/useNewPost";
 import { Loader2Icon } from "lucide-react";
 import useUploadMedia from "../hooks/useUploadMedia";
 import PostForm from "../components/custom-ui/PostForm";
 import { formSchema } from "../lib/schemas";
 import { MediaPayload } from "../lib/types";
+import useCreatePost from "../hooks/useCreatePost";
+import { getLinkType } from "../lib/utils";
 
 export default function PostFormPage() {
   const navigate = useNavigate();
 
   const { user } = useAuthContext();
-  const { mutate: newPost, isPending: isLoadingNewPost } = useNewPost();
+  const { mutate: createPost, isPending: isLoadingNewPost } = useCreatePost();
   const uploadMedia = useUploadMedia();
 
   async function handleSubmit(values: z.infer<typeof formSchema>) {
@@ -34,7 +35,16 @@ export default function PostFormPage() {
       media.mediaSource = uploadedUrls;
     }
 
-    newPost(
+    if (values.mediaLink && values.mediaLink.length > 0) {
+      const link = values.mediaLink;
+      const type = getLinkType(link);
+      media.mediaType = [type];
+      media.mediaSource = [link];
+      media.mediaName = [link];
+      media.mediaSize = null;
+    }
+
+    createPost(
       {
         userID: user.id,
         title: values.title,

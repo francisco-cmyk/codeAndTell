@@ -14,7 +14,7 @@ export default function Sidebar() {
             <Link
               to='/'
               className={`${
-                pathname === "/" ? "bg-slate-200 bg-accent" : ""
+                pathname === "/" ? "bg-slate-200 dark:bg-accent" : ""
               } group flex h-8 w-full items-center rounded-lg px-2 font-normal text-foreground underline-offset-2 hover:bg-slate-200 dark:hover:bg-accent hover:text-accent-foreground`}
             >
               allProjects
@@ -22,7 +22,7 @@ export default function Sidebar() {
             <Link
               to='/myPosts'
               className={`${
-                pathname === "/myPosts" ? "bg-slate-200 bg-accent" : ""
+                pathname === "/myPosts" ? "bg-slate-200 dark:bg-accent" : ""
               } group flex h-8 w-full items-center rounded-lg px-2 font-normal text-foreground underline-offset-2 hover:bg-slate-200 dark:hover:bg-accent hover:text-accent-foreground`}
             >
               myPosts
@@ -30,7 +30,7 @@ export default function Sidebar() {
             <Link
               to='/ask4help'
               className={`${
-                pathname === "/ask4help" ? "bg-slate-200 bg-accent" : ""
+                pathname === "/ask4help" ? "bg-slate-200 dark:bg-accent" : ""
               } group flex h-8 w-full items-center rounded-lg px-2 font-normal text-foreground underline-offset-2 hover:bg-slate-200 dark:hover:bg-accent hover:text-accent-foreground`}
             >
               askForHelp
@@ -39,7 +39,7 @@ export default function Sidebar() {
             {/* <Link
               to='/rateMyProject'
               className={`${
-                pathname === "/rateMyProject" ? "bg-slate-200 bg-accent" : ""
+                pathname === "/rateMyProject" ? "bg-slate-200 dark:bg-accent" : ""
               } group flex h-8 w-full items-center rounded-lg px-2 font-normal text-foreground underline-offset-2 hover:bg-slate-200 dark:hover:bg-accent hover:text-accent-foreground`}
             >
               rateMyProject

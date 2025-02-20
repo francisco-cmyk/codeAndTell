@@ -2,7 +2,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
-import { showToast, urlToFile } from "../../lib/utils";
+import { getEmbedURL, showToast, urlToFile } from "../../lib/utils";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../ui-lib/Tabs";
 import { Button } from "../ui-lib/Button";
 import {
@@ -41,6 +41,7 @@ const formSchema = z.object({
   description: z.string().min(2, "Please add a description").max(5000),
   media: z.array(z.any()),
   badges: z.string().array().min(1, "Select atleast once badge").max(3),
+  mediaLink: z.string().optional(),
 });
 
 export default function PostForm({ post, onSubmit }: FormProps) {
@@ -53,6 +54,7 @@ export default function PostForm({ post, onSubmit }: FormProps) {
       description: "",
       badges: [],
       media: [],
+      mediaLink: "",
     },
   });
 
@@ -60,6 +62,7 @@ export default function PostForm({ post, onSubmit }: FormProps) {
   const { errors } = formState;
   const mediaFiles = watch("media");
   const badges = watch("badges");
+  const mediaLink = watch("mediaLink");
 
   //
   // Side Effect
@@ -84,7 +87,7 @@ export default function PostForm({ post, onSubmit }: FormProps) {
       }
 
       const files = await Promise.all(
-        post.mediaUrl.map((url, index) => urlToFile(url, post.mediaType[index]))
+        post.mediaUrl.map((url, index) => urlToFile(url, post.mediaName[index]))
       );
 
       reset((prevValues) => ({
@@ -101,16 +104,13 @@ export default function PostForm({ post, onSubmit }: FormProps) {
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className='w-3/4 space-y-4 min-h-full'
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className='w-3/4 space-y-4'>
         <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full'>
           <TabsList className='grid w-full grid-cols-2 h-10 mb-3'>
             <TabsTrigger value='text'>Text</TabsTrigger>
             <TabsTrigger value='multimedia'>Multimedia</TabsTrigger>
           </TabsList>
-          <TabsContent value='text' className='min-h-fit'>
+          <TabsContent value='text' className='min-h-fit p-1'>
             <FormField
               control={form.control}
               name='title'
@@ -166,7 +166,10 @@ export default function PostForm({ post, onSubmit }: FormProps) {
               )}
             />
           </TabsContent>
-          <TabsContent value='multimedia' className='min-h-[400px]'>
+          <TabsContent
+            value='multimedia'
+            className='h-[calc(100vh-400px)] p-1 overflow-y-auto'
+          >
             <FormField
               control={form.control}
               name='media'
@@ -181,6 +184,46 @@ export default function PostForm({ post, onSubmit }: FormProps) {
                       values={mediaFiles}
                       onChange={(files) => setValue("media", files)}
                     />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name='mediaLink'
+              render={({ field }) => (
+                <FormItem className='mt-2'>
+                  <FormLabel id='mediaLink'>Video URL</FormLabel>
+                  <FormDescription>Or link a snazzy video</FormDescription>
+                  <FormControl>
+                    <div className='w-full flex flex-col items-center justify-start'>
+                      <Input
+                        placeholder='paste video link (Youtube, Vimeo, MP4)..'
+                        type='text'
+                        value={field.value}
+                        disabled={mediaFiles.length > 0}
+                        onChange={field.onChange}
+                      />
+                      {mediaLink && (
+                        <div className='relative w-full h-96 rounded-lg overflow-hidden pt-2'>
+                          {mediaLink.includes("youtube.com") ||
+                          mediaLink.includes("vimeo.com") ? (
+                            <iframe
+                              src={getEmbedURL(mediaLink)}
+                              allowFullScreen
+                              className=' inset-0 w-full h-full'
+                              loading='lazy'
+                            />
+                          ) : (
+                            <video
+                              src={mediaLink}
+                              controls
+                              className='w-full h-auto rounded-lg shadow-md'
+                            />
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </FormControl>
                 </FormItem>
               )}
