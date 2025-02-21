@@ -1,5 +1,10 @@
 import "./App.css";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Layout from "./pages/Layout";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import HelpPage from "./pages/HelpPage";
@@ -27,7 +32,8 @@ function App() {
         <Router>
           <Routes>
             <Route path='/' element={<Layout />}>
-              <Route index element={<AllPosts />} />
+              <Route index element={<Navigate to='/feed' replace />} />
+              <Route path='/feed' element={<AllPosts />} />
               <Route path='/newPost' element={<PostForm />} />
               <Route path='/ask4help' element={<HelpPage />} />
               <Route path='/myPosts' element={<UserPosts />} />

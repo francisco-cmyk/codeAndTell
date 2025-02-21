@@ -10,7 +10,6 @@ import { createAcronym } from "../../lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui-lib/Avatar";
 import { Separator } from "../ui-lib/Separator";
 import { Skeleton } from "../ui-lib/Skeleton";
-import parse from "html-react-parser";
 import { useSearchParams } from "react-router-dom";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui-lib/Popover";
 import { Button } from "../ui-lib/Button";
@@ -22,6 +21,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import EditDialog from "./EditDialog";
 import { keyBy } from "lodash";
 import useEditComment from "../../hooks/useEditComment";
+import { htmlParser } from "../../lib/parser";
 
 type CommentSectionProps = {
   comments: CommentType[];
@@ -232,7 +232,7 @@ export default function CommentsSection(props: CommentSectionProps) {
 
               <p className='text-xs mb-2'>{comment.profile.name}</p>
             </div>
-            <p className='pl-4 pb-2 mt-2'>{parse(comment.content)}</p>
+            <p className='pl-4 pb-2 mt-2'>{htmlParser(comment.content)}</p>
             <span className='text-xs text-right'>{comment.createdAt}</span>
             <Separator className='mt-2 ' />
           </div>

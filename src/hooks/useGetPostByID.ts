@@ -1,19 +1,22 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../config/supabaseConfig";
-import { z, ZodError } from "zod";
+import { z } from "zod";
 import { formatTimestamp, showToast } from "../lib/utils";
 import { PostgrestError } from "@supabase/supabase-js";
-import { SinglePostType } from "../lib/types";
-import { SinglePostSchema } from "../lib/schemas";
+import { PostSchema } from "../lib/schemas";
+import { PostType } from "../lib/types";
 
-type PostDBType = z.infer<typeof SinglePostSchema>;
+const defaultName = "Anon";
+const defaultAvatar = "public/anon-user.png";
+
+type PostDBType = z.infer<typeof PostSchema>;
 
 export async function fetchUserPostByID(
-  userID: string,
-  postID: string
+  postID: string,
+  userID?: string
 ): Promise<PostDBType | undefined> {
   try {
-    const { data } = await supabase
+    let query = supabase
       .from("content")
       .select(
         `
@@ -28,27 +31,56 @@ export async function fetchUserPostByID(
             media_source,
             media_type,
             media_size,
-            media_name
+            media_name,
+            profiles (
+                id,
+                full_name,
+                avatar_url
+            ),
+            comments!post_id (
+              id,
+              content,
+              created_at,
+              user_id,
+              parent_comment_id,
+              profiles!comments_user_id_fkey (
+                id,
+                full_name,
+                avatar_url
+              )
+            )
         `
       )
-      .eq("created_by_id", userID)
-      .eq("id", postID);
+      .eq("id", postID)
+      .order("created_at", { foreignTable: "comments", ascending: false });
+
+    if (userID) {
+      query = query.eq("created_by_id", userID);
+    }
+
+    const { data } = await query;
 
     if (data) {
-      return SinglePostSchema.parse(data[0]);
+      return PostSchema.parse(data[0]);
     } else {
       [];
     }
   } catch (error) {
-    if (error instanceof ZodError) {
-      const errorMessages = error.issues.map((issue) => {
-        return `${issue.path.join(".")}: ${issue.message}`;
-      });
+    if (error instanceof z.ZodError) {
+      error.errors.forEach((err) => {
+        let errorMessage;
 
-      showToast({
-        type: "error",
-        message: `Error was an error retrieving post:, ${errorMessages}`,
-        toastId: "fetchUserPostError",
+        if (err.path.length === 0) {
+          errorMessage = `Invalid input: ${err.message}`;
+        } else {
+          errorMessage = `${err.path.join(".")} - ${err.message}`;
+        }
+
+        showToast({
+          type: "error",
+          message: `Validation error - ${errorMessage}`,
+          toastId: "fetchUserPostZodError",
+        });
       });
     } else {
       const Error = error as PostgrestError;
@@ -62,15 +94,15 @@ export async function fetchUserPostByID(
 }
 
 type Params = {
-  userID: string;
   postID: string;
+  userID?: string;
 };
 
 export default function useGetUserPostByID(params: Params) {
-  return useQuery<SinglePostType, Error>({
+  return useQuery<PostType, Error>({
     queryKey: ["user-posts-by-id", params],
     queryFn: async () => {
-      const data = await fetchUserPostByID(params.userID, params.postID);
+      const data = await fetchUserPostByID(params.postID, params.userID);
 
       if (!data) {
         showToast({
@@ -85,25 +117,45 @@ export default function useGetUserPostByID(params: Params) {
         id: data.id,
         createdAt: formatTimestamp(data.created_at),
         updatedAt: data.updated_at ? formatTimestamp(data.updated_at) : null,
-        createdById: data.created_by_id,
+        createdById: data.created_by_id ?? "",
         updatedById: data.updated_by_id,
-        title: data.title,
-        description: data.description,
-        badges: data.badges,
-        mediaSource: data.media_source ?? [],
-        mediaSize: data.media_size ?? [],
-        mediaName: data.media_name ?? [],
-        mediaType: data.media_type ?? [],
-        mediaUrl: [],
+        title: data.title ?? "",
+        description: data.description ?? "",
+        badges: data.badges ?? [],
+        media: (data.media_source ?? []).map((source, index) => ({
+          mediaSource: source ?? "",
+          mediaSize: data.media_size ? data.media_size[index] : 0,
+          mediaName: data.media_name ? data.media_name[index] : "",
+          mediaType: data.media_type ? data.media_type[index] : "",
+          mediaUrl: "",
+        })),
+        profile: {
+          id: data.profiles.id,
+          avatarURL: data.profiles.avatar_url ?? defaultAvatar,
+          name: data.profiles.full_name ?? defaultName,
+        },
+        comments: data.comments.map((comment) => ({
+          id: comment.id,
+          userID: comment.user_id,
+          parentCommentID: comment.parent_comment_id,
+          content: comment.content,
+          createdAt: formatTimestamp(comment.created_at ?? ""),
+          profile: {
+            id: comment.profiles.id,
+            avatarURL: comment.profiles.avatar_url ?? defaultAvatar,
+            name: comment.profiles.full_name ?? defaultName,
+          },
+        })),
       };
 
       const postWithMedia = await (async () => {
-        if (!post.mediaSource) {
-          return { ...post, mediaUrl: [] };
+        if (post.media.length === 0) {
+          return { ...post, media: [] };
         }
 
         const publicUrls = await Promise.all(
-          post.mediaSource.map(async (path) => {
+          post.media.map(async (mediaItem) => {
+            let path = mediaItem.mediaSource;
             path = path.trim().toLowerCase();
             const { data } = await supabase.storage
               .from("media")
@@ -113,11 +165,16 @@ export default function useGetUserPostByID(params: Params) {
           })
         );
 
-        return { ...post, mediaUrl: publicUrls };
+        const mediaWithURLs = post.media.map((mediaItem, index) => ({
+          ...mediaItem,
+          mediaUrl: publicUrls[index],
+        }));
+
+        return { ...post, media: mediaWithURLs };
       })(); // self invoking function
 
       return postWithMedia;
     },
-    enabled: params.userID.length > 0 && params.postID.length > 0,
+    enabled: params.postID.length > 0,
   });
 }

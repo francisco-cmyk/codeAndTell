@@ -1,9 +1,11 @@
 import { keyBy } from "lodash";
 import Feed from "../components/custom-ui/Feed";
 import useGetPosts from "../hooks/useGetPosts";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import getMergeState from "../lib/utils";
 import CommentPanel from "../components/custom-ui/CommentPanel";
+import { useSearchParams } from "react-router-dom";
+import PostView from "../components/custom-ui/PostView";
 
 type State = {
   selectedID: string;
@@ -16,21 +18,31 @@ const initialState: State = {
 };
 
 export default function AllPosts() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [state, setState] = useState(initialState);
   const mergeState = getMergeState(setState);
 
   const { data: posts = [], isLoading: isLoadingPosts } = useGetPosts();
 
   const postKeyedById = keyBy(posts, "id");
-  // const selectedPost = postKeyedById[state.selectedID ?? ""]; TODO: implement
   const selectedComments = postKeyedById[state.selectedCommentPostID ?? ""];
+  const searchParamPostID = searchParams.get("postID") ?? "";
+  const searchParamComView = searchParams.get("comView") ?? "";
+
+  useEffect(() => {
+    if (searchParamComView && !state.selectedCommentPostID) {
+      mergeState({ selectedCommentPostID: searchParamComView });
+    }
+  }, [searchParamComView]);
 
   function handleSelectPost(id: string): void {
-    if (!state.selectedID) {
-      mergeState({ selectedID: id });
-      return;
+    if (!searchParams.has("postID")) {
+      setSearchParams({ postID: id });
+    } else {
+      const newParams = new URLSearchParams(searchParams);
+      newParams.set("postID", id);
+      setSearchParams(newParams, { replace: true });
     }
-    mergeState({ selectedID: "" });
   }
 
   function handleSelectedCommentPostID(id: string): void {
@@ -38,6 +50,10 @@ export default function AllPosts() {
   }
 
   function handleCommentsClose() {
+    if (searchParams.has("comView")) {
+      searchParams.delete("comView");
+      setSearchParams(searchParams);
+    }
     mergeState({ selectedCommentPostID: "" });
   }
 
@@ -49,12 +65,16 @@ export default function AllPosts() {
         className={isCommentOpen ? "flex-1" : "flex-auto"}
         onClick={handleCommentsClose}
       >
-        <Feed
-          isLoading={isLoadingPosts}
-          posts={posts}
-          onSelect={handleSelectPost}
-          onCommentSelect={handleSelectedCommentPostID}
-        />
+        {searchParamPostID ? (
+          <PostView />
+        ) : (
+          <Feed
+            isLoading={isLoadingPosts}
+            posts={posts}
+            onSelect={handleSelectPost}
+            onCommentSelect={handleSelectedCommentPostID}
+          />
+        )}
       </div>
       <CommentPanel
         post={selectedComments}

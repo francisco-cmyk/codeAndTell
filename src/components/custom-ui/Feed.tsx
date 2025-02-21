@@ -2,7 +2,6 @@ import { PostType } from "../../lib/types";
 import { createAcronym, getEmbedURL } from "../../lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui-lib/Avatar";
 import { Badge } from "../ui-lib/Badge";
-import { all, createLowlight } from 'lowlight';
 import {
   Card,
   CardContent,
@@ -20,14 +19,15 @@ import {
 } from "../ui-lib/Carousel";
 import { Skeleton } from "../ui-lib/Skeleton";
 import { Trash2, MessageCircle, PencilIcon } from "lucide-react";
-import parse from "html-react-parser";
-import { Element, Text } from "html-react-parser";
 import { Button } from "../ui-lib/Button";
 import { useAuthContext } from "../../context/auth";
 import useDeletePost from "../../hooks/useDeletePost";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import DeleteDialog from "./DeleteDialog";
+import { htmlParser } from "../../lib/parser";
+import BackgroundImage from "./BackgroundImage";
+import { useSearchParams } from "react-router-dom";
 
 type FeedProps = {
   isLoading: boolean;
@@ -39,6 +39,7 @@ type FeedProps = {
 };
 
 export default function Feed(props: FeedProps) {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [deletePostID, setDeletePostID] = useState<string | null>(null);
 
   const { user } = useAuthContext();
@@ -46,9 +47,28 @@ export default function Feed(props: FeedProps) {
 
   const { mutate: deletePost } = useDeletePost();
 
+  const postRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+
   const isUserPost = props.isUserPost ?? false;
 
   const placeholders = Array.from(Array(3).keys());
+  const searchParamComView = searchParams.get("comView") ?? "";
+
+  useEffect(() => {
+    // Effect to scroll post into view on page reload
+    const postID = searchParamComView;
+    const element = postRefs.current[postID];
+
+    if (postID && element) {
+      const parent = element.parentElement;
+      if (parent) {
+        parent.scrollTo({
+          top: element.offsetTop - 100,
+          behavior: "smooth",
+        });
+      }
+    }
+  }, [searchParamComView, props.posts]);
 
   if (props.posts.length === 0 && !props.isLoading) {
     return (
@@ -68,6 +88,7 @@ export default function Feed(props: FeedProps) {
 
   function handleCommentSelect(id: string) {
     if (props.onCommentSelect) {
+      setSearchParams({ comView: id });
       props.onCommentSelect(id);
     }
   }
@@ -95,37 +116,9 @@ export default function Feed(props: FeedProps) {
     );
   }
 
-  const lowlight = createLowlight(all)
-
-  const options = {
-    replace: (domNode) => {
-      if (domNode instanceof Element && domNode.tagName === "code") {
-        const className = domNode.attribs?.className || "";
-        const languageMatch = className.match(/language-(\w+)/);
-        const language = languageMatch ? languageMatch[1] : "plaintext";
-        console.log("THIS IS LANGUAGE:", language);
-
-        if (lowlight.listLanguages().includes(language)) {
-          const textContent = domNode.children
-          .map((child) => (child instanceof Text ? child.data : "")) // `text` is the correct property
-          .join("");
-
-          const highlighted = lowlight.highlight(language, textContent);
-          console.log("THIS IS HIGHLIGHTED:", highlighted);
-          return (
-            <code
-              className={`language-${language} hljs`}
-              dangerouslySetInnerHTML={{ __html: highlighted.children[0].value }}
-            />
-          );
-        }
-      }
-    },
-  };
-
   return (
     <div
-      className={`min-w-[700px] max-w-3xl h-full grid grid-cols-1 gap-y-12 p-3 pb-44 place-self-center overflow-y-auto no-scrollbar`}
+      className={`min-w-[700px] max-w-3xl h-full grid grid-cols-1 gap-y-12 p-3 pb-44 place-self-center overflow-y-auto no-scrollbar cursor-pointer`}
     >
       <DeleteDialog
         isOpen={!!deletePostID}
@@ -142,6 +135,7 @@ export default function Feed(props: FeedProps) {
         : props.posts.map((post, index) => (
             <Card
               key={`${post.title}-${index}`}
+              ref={(el) => (postRefs.current[post.id] = el)}
               className={`min-w-full place-self-center hover:bg-zinc-50 dark:bg-zinc-900 hover:dark:bg-zinc-800`}
               onClick={() => handleSelectPost(post.id)}
             >
@@ -163,14 +157,14 @@ export default function Feed(props: FeedProps) {
                   <p>{post.createdAt}</p>
                 </CardDescription>
                 <CardDescription className={`dark:text-slate-50`}>
-                  {parse(post.description ?? "", options)}
+                  {htmlParser(post.description)}
                 </CardDescription>
               </CardHeader>
               <CardContent
                 className='relative w-full p-1 mx-auto overflow-hidden '
                 onClick={(e) => e.stopPropagation()}
               >
-                <Carousel className='w-full mx-auto'>
+                <Carousel className='w-full mx-auto rounded-lg overflow-hidden'>
                   <CarouselContent>
                     {post.media.map((mediaFile, index) => {
                       const isImage = mediaFile.mediaType
@@ -197,13 +191,13 @@ export default function Feed(props: FeedProps) {
                             </>
                           )}
                           {isVideo && (
-                            <div className='w-full h-96 rounded-lg overflow-hidden pt-2'>
+                            <div className='flex-grow h-96 rounded-lg overflow-hidden flex justify-center items-center '>
                               {mediaFile.mediaSource.includes("youtube.com") ||
                               mediaFile.mediaSource.includes("vimeo.com") ? (
                                 <iframe
                                   src={getEmbedURL(mediaFile.mediaSource)}
                                   allowFullScreen
-                                  className=' inset-0 w-full h-full'
+                                  className='w-full h-full pl-2'
                                   loading='lazy'
                                 />
                               ) : (
@@ -284,14 +278,5 @@ export default function Feed(props: FeedProps) {
             </Card>
           ))}
     </div>
-  );
-}
-
-function BackgroundImage(props: { image: string }) {
-  return (
-    <div
-      className='absolute inset-0 bg-center bg-cover blur-lg brightness-75'
-      style={{ backgroundImage: `url(${props.image})` }}
-    ></div>
   );
 }

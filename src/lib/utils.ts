@@ -5,6 +5,22 @@ import { toast, ToastOptions, ToastPosition } from "react-toastify";
 import CustomToast from "../components/custom-ui/CustomToast";
 
 //
+// Lowlight language map
+//
+
+export const languageMap: Record<string, string> = {
+  js: "javascript",
+  ts: "typescript",
+  html: "html",
+  css: "css",
+  py: "python",
+  rb: "ruby",
+  sh: "bash",
+  yml: "yaml",
+  md: "markdown",
+};
+
+//
 // ShadCN Styling
 //
 

@@ -88,10 +88,10 @@ export default function useGetPosts() {
         id: datum.id,
         createdAt: formatTimestamp(datum.created_at),
         updatedAt: datum.updated_at,
-        createdById: datum.created_by_id,
+        createdById: datum.created_by_id ?? "",
         updatedById: datum.updated_by_id,
-        title: datum.title,
-        description: datum.description,
+        title: datum.title ?? "",
+        description: datum.description ?? "",
         badges: datum.badges ?? [],
         media: [],
         profile: {
