@@ -6,7 +6,8 @@ type Params = {
   postID: string;
   userID: string;
   content: string;
-  parentCommentID?: string;
+  parentCommentID?: number;
+  key: string[];
 };
 
 export default function usePostComment() {
@@ -18,6 +19,7 @@ export default function usePostComment() {
           post_id: params.postID,
           user_id: params.userID,
           content: params.content,
+          parent_comment_id: params.parentCommentID ?? null,
         },
       ]);
       if (error) {
@@ -33,6 +35,15 @@ export default function usePostComment() {
         });
       }
     },
-    onSuccess: () => {},
+    // onSuccess: (_, variables) => {
+    //   queryClient.invalidateQueries({
+    //     queryKey: [variables.key],
+    //   });
+    // },
+    // onSettled: (_, _1, variables) => {
+    //   queryClient.invalidateQueries({
+    //     queryKey: [variables.key],
+    //   });
+    // },
   });
 }

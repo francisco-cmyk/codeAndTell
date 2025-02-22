@@ -13,16 +13,16 @@ import {
 } from "../ui-lib/Carousel";
 import BackgroundImage from "./BackgroundImage";
 import { Badge } from "../ui-lib/Badge";
-import { Separator } from "../ui-lib/Separator";
 import TiptapEditor from "./TipTapEditor";
 import { useState } from "react";
 import usePostComment from "../../hooks/usePostComment";
-import { useQueryClient } from "@tanstack/react-query";
 import { Skeleton } from "../ui-lib/Skeleton";
+import Comment from "./Comment";
+
+const querykey = ["user-posts-by-id"];
 
 export default function PostView() {
   const { user } = useAuthContext();
-  const queryClient = useQueryClient();
   const [searchParams] = useSearchParams();
   const [comment, setComment] = useState("");
 
@@ -47,13 +47,11 @@ export default function PostView() {
         userID: user.id,
         content: comment,
         postID: postId,
+        key: querykey,
       },
       {
         onSuccess: () => {
           setComment("");
-          queryClient.invalidateQueries({
-            queryKey: ["user-posts-by-id"],
-          });
         },
       }
     );
@@ -182,27 +180,13 @@ export default function PostView() {
           className={`w-full overflow-y-auto flex flex-col justify-start gap-y-4 pr-5 pb-10 no-scrollbar`}
         >
           {post.comments.map((comment, index) => (
-            <div
-              key={`${comment.userID}-${index}`}
-              className='flex flex-col text-sm min-h-fit'
-            >
-              <div className='w-full flex mt-3'>
-                <Avatar className='h-5 w-5 mr-2'>
-                  <AvatarImage
-                    src={comment.profile.avatarURL}
-                    alt='@profilePic'
-                  />
-                  <AvatarFallback>
-                    {createAcronym(comment.profile.name)}
-                  </AvatarFallback>
-                </Avatar>
-
-                <p className='text-xs mb-2'>{comment.profile.name}</p>
-              </div>
-              <p className='pl-4 pb-2 mt-2'>{htmlParser(comment.content)}</p>
-              <span className='text-xs text-right'>{comment.createdAt}</span>
-              <Separator className='mt-2 ' />
-            </div>
+            <Comment
+              key={`${comment}-${index}`}
+              comment={comment}
+              postID={post.id}
+              userID={user.id}
+              querykey={["user-posts-by-id"]}
+            />
           ))}
         </div>
       </section>

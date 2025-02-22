@@ -5,6 +5,7 @@ import { formatTimestamp, showToast } from "../lib/utils";
 import { PostgrestError } from "@supabase/supabase-js";
 import { MediaType, PostType } from "../lib/types";
 import { PostSchema } from "../lib/schemas";
+import { postQuery } from "../lib/queries";
 
 const defaultName = "Anon";
 const defaultAvatar = "public/anon-user.png";
@@ -15,39 +16,7 @@ async function fetchHelpPosts(): Promise<PostDBType[] | undefined> {
   try {
     const { data } = await supabase
       .from("content")
-      .select(
-        `
-            id,
-            created_at,
-            updated_at,
-            created_by_id,
-            updated_by_id,
-            title,
-            description,
-            badges,
-            media_source,
-            media_type,
-            media_size,
-            media_name,
-            profiles (
-                id,
-                full_name,
-                avatar_url
-            ),
-            comments!post_id (
-              id,
-              content,
-              created_at,
-              user_id,
-              parent_comment_id,
-              profiles!comments_user_id_fkey (
-                id,
-                full_name,
-                avatar_url
-              )
-            )
-        `
-      )
+      .select(postQuery)
       .eq("getHelp", true)
       .order("created_at", { ascending: false });
 
@@ -88,10 +57,10 @@ export default function useGetHelpPosts() {
         id: datum.id,
         createdAt: formatTimestamp(datum.created_at),
         updatedAt: datum.updated_at,
-        createdById: datum.created_by_id,
+        createdById: datum.created_by_id ?? "",
         updatedById: datum.updated_by_id,
-        title: datum.title,
-        description: datum.description,
+        title: datum.title ?? "",
+        description: datum.description ?? "",
         badges: datum.badges ?? [],
         media: [],
         profile: {
@@ -105,6 +74,8 @@ export default function useGetHelpPosts() {
           parentCommentID: comment.parent_comment_id,
           content: comment.content,
           createdAt: formatTimestamp(comment.created_at ?? ""),
+          likeCount: comment.like_count[0].count ?? 0,
+          userHasLiked: false,
           profile: {
             id: comment.profiles.id,
             avatarURL: comment.profiles.avatar_url ?? defaultAvatar,

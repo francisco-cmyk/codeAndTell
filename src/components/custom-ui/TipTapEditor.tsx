@@ -9,6 +9,7 @@ import { Button } from "../ui-lib/Button";
 import { useAuthContext } from "../../context/auth";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import { all, createLowlight } from "lowlight";
+import { cn } from "../../lib/utils";
 
 const lowlight = createLowlight(all);
 
@@ -34,6 +35,7 @@ type EditorProps = {
   value?: string;
   variant?: VariantType;
   showSubmit?: boolean;
+  className?: string;
   onChange?: (content: string) => void;
   onSubmit?: (content?: string) => void;
 };
@@ -109,10 +111,6 @@ export default function TiptapEditor(props: EditorProps) {
         editor.chain().focus().toggleBold().run();
         return;
       }
-      // case ToolbarType.codeBlock: {
-      //   editor.chain().focus().toggleCodeBlock().run();
-      //   return;
-      // }
       case ToolbarType.italic: {
         editor.chain().focus().toggleItalic().run();
         return;
@@ -153,7 +151,12 @@ export default function TiptapEditor(props: EditorProps) {
   if (!editor) return null;
 
   return (
-    <div className='p-2 border-2 w-full rounded-lg min-h-36 max-h-96 overflow-y-auto'>
+    <div
+      className={cn(
+        "p-2 border-2 w-full rounded-lg min-h-36 max-h-96 overflow-y-auto",
+        props.className
+      )}
+    >
       <div className='flex gap-2 mb-1 border-b pb-1'>
         <button
           className={`p-1 ${

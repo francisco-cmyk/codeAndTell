@@ -3,6 +3,7 @@ import { twMerge } from "tailwind-merge";
 import { formatDistanceToNow } from "date-fns";
 import { toast, ToastOptions, ToastPosition } from "react-toastify";
 import CustomToast from "../components/custom-ui/CustomToast";
+import { groupBy, keyBy } from "lodash";
 
 //
 // Lowlight language map
@@ -197,4 +198,49 @@ export function getEmbedURL(url: string) {
   }
 
   return url;
+}
+
+//
+// Nested Comments Formatting
+//
+
+type Comment = {
+  id: number;
+  userID: string;
+  content: string;
+  createdAt: string;
+  likeCount: number;
+  parentCommentID: number | null;
+  // replies: Comment[];
+  userHasLiked: boolean;
+  profile: {
+    id: string;
+    avatarURL: string;
+    name: string;
+  };
+};
+
+type CommentWithReplies = Comment & { replies: CommentWithReplies[] };
+
+export function buildCommentTree(comments: Comment[]): CommentWithReplies[] {
+  if (!comments || comments.length === 0) return [];
+
+  const _comments: CommentWithReplies[] = comments.map((comment) => ({
+    ...comment,
+    replies: [],
+  }));
+
+  const commentMap = keyBy(_comments, "id");
+  const groupByParent = groupBy(_comments, "parentCommentID");
+
+  Object.keys(groupByParent).forEach((parentID) => {
+    const parentIDNum = parseInt(parentID, 10);
+    if (!isNaN(parentIDNum) && commentMap[parentIDNum]) {
+      commentMap[parentIDNum].replies = groupByParent[
+        parentIDNum
+      ] as CommentWithReplies[];
+    }
+  });
+
+  return (groupByParent.null as CommentWithReplies[]) || [];
 }

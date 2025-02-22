@@ -1,10 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../config/supabaseConfig";
 import { z } from "zod";
-import { formatTimestamp, showToast } from "../lib/utils";
-import { PostgrestError } from "@supabase/supabase-js";
+import { buildCommentTree, formatTimestamp, showToast } from "../lib/utils";
+import { PostgrestError, User } from "@supabase/supabase-js";
 import { PostSchema } from "../lib/schemas";
 import { PostType } from "../lib/types";
+import { postQuery } from "../lib/queries";
 
 const defaultName = "Anon";
 const defaultAvatar = "public/anon-user.png";
@@ -16,43 +17,7 @@ export async function fetchUserPostByID(
   userID?: string
 ): Promise<PostDBType | undefined> {
   try {
-    let query = supabase
-      .from("content")
-      .select(
-        `
-            id,
-            created_at,
-            updated_at,
-            created_by_id,
-            updated_by_id,
-            title,
-            description,
-            badges,
-            media_source,
-            media_type,
-            media_size,
-            media_name,
-            profiles (
-                id,
-                full_name,
-                avatar_url
-            ),
-            comments!post_id (
-              id,
-              content,
-              created_at,
-              user_id,
-              parent_comment_id,
-              profiles!comments_user_id_fkey (
-                id,
-                full_name,
-                avatar_url
-              )
-            )
-        `
-      )
-      .eq("id", postID)
-      .order("created_at", { foreignTable: "comments", ascending: false });
+    let query = supabase.from("content").select(postQuery).eq("id", postID);
 
     if (userID) {
       query = query.eq("created_by_id", userID);
@@ -93,6 +58,16 @@ export async function fetchUserPostByID(
   }
 }
 
+async function fetchUser(): Promise<User | null> {
+  const { data, error } = await supabase.auth.getSession();
+
+  if (error) {
+    throw error;
+  }
+
+  return data.session?.user || null;
+}
+
 type Params = {
   postID: string;
   userID?: string;
@@ -103,6 +78,9 @@ export default function useGetUserPostByID(params: Params) {
     queryKey: ["user-posts-by-id", params],
     queryFn: async () => {
       const data = await fetchUserPostByID(params.postID, params.userID);
+      const userDB = await fetchUser();
+
+      const user = userDB ? userDB.id : params.userID;
 
       if (!data) {
         showToast({
@@ -113,7 +91,7 @@ export default function useGetUserPostByID(params: Params) {
         throw new Error("Error: no post found.");
       }
 
-      const post = {
+      let post = {
         id: data.id,
         createdAt: formatTimestamp(data.created_at),
         updatedAt: data.updated_at ? formatTimestamp(data.updated_at) : null,
@@ -134,12 +112,17 @@ export default function useGetUserPostByID(params: Params) {
           avatarURL: data.profiles.avatar_url ?? defaultAvatar,
           name: data.profiles.full_name ?? defaultName,
         },
+        commentCount: data.comments.length ?? 0,
         comments: data.comments.map((comment) => ({
           id: comment.id,
           userID: comment.user_id,
           parentCommentID: comment.parent_comment_id,
           content: comment.content,
-          createdAt: formatTimestamp(comment.created_at ?? ""),
+          createdAt: formatTimestamp(comment.created_at),
+          likeCount: comment.like_count[0].count ?? 0,
+          userHasLiked: comment.users_liked.some(
+            (like) => like.user_id === user
+          ),
           profile: {
             id: comment.profiles.id,
             avatarURL: comment.profiles.avatar_url ?? defaultAvatar,
@@ -147,6 +130,8 @@ export default function useGetUserPostByID(params: Params) {
           },
         })),
       };
+
+      post = { ...post, comments: buildCommentTree(post.comments) };
 
       const postWithMedia = await (async () => {
         if (post.media.length === 0) {
