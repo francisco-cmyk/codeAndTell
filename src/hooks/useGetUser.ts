@@ -16,7 +16,7 @@ type Params = {
   sessionID: string | undefined;
 };
 
-export default function useGetSession(params: Params) {
+export default function useGetUser(params: Params) {
   return useQuery<UserDBType | undefined, Error>({
     queryKey: ["userData", params.sessionID],
     queryFn: async () => {

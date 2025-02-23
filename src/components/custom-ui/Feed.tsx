@@ -245,7 +245,7 @@ export default function Feed(props: FeedProps) {
                   >
                     <MessageCircle className='h-5 w-5 text-zinc-400' />
                     <p className='text-sm font-semibold text-foreground'>
-                      {post.comments.length}
+                      {post.commentCount}
                     </p>
                   </Button>
 

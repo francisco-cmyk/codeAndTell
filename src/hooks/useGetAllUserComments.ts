@@ -13,7 +13,7 @@ const CommentSchema = z.object({
   post_id: z.string(),
   user_id: z.string(),
   comment_text: z.string(),
-  parent_comment_id: z.nullable(z.string()),
+  parent_comment_id: z.nullable(z.number()),
   created_at: z.string(),
   profiles: z.object({
     //User profile

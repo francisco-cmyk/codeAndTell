@@ -21,10 +21,12 @@ export const PostSchema = z.object({
   comments: z.array(
     z.object({
       content: z.string(),
-      created_at: z.nullable(z.string()),
+      created_at: z.string(),
       id: z.number(),
-      parent_comment_id: z.nullable(z.string()),
+      parent_comment_id: z.nullable(z.number()),
       user_id: z.string(),
+      like_count: z.array(z.object({ count: z.number() })),
+      users_liked: z.array(z.object({ user_id: z.string() })),
       profiles: z.object({
         id: z.string(),
         avatar_url: z.nullable(z.string()),

@@ -28,12 +28,15 @@ export type PostType = {
     avatarURL: string;
     name: string;
   };
+  commentCount: number;
   comments: {
     id: number;
     userID: string;
     content: string;
-    parentCommentID: string | null;
-    createdAt: string | null;
+    createdAt: string;
+    likeCount: number;
+    parentCommentID: number | null;
+    userHasLiked: boolean;
     profile: {
       id: string;
       avatarURL: string;
@@ -47,8 +50,8 @@ export type CommentType = {
   userID: string;
   content: string;
   postID: string;
-  parentCommentID: string | null;
-  createdAt: string | null;
+  parentCommentID: number | null;
+  createdAt: string;
   profile: {
     id: string;
     avatarURL: string;

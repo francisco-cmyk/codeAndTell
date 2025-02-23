@@ -1,10 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../config/supabaseConfig";
 import { z, ZodError } from "zod";
-import { formatTimestamp, showToast } from "../lib/utils";
-import { PostgrestError } from "@supabase/supabase-js";
+import { buildCommentTree, formatTimestamp, showToast } from "../lib/utils";
+import { PostgrestError, User } from "@supabase/supabase-js";
 import { MediaType, PostType } from "../lib/types";
 import { PostSchema } from "../lib/schemas";
+import { postQuery } from "../lib/queries";
 
 const defaultName = "Anon";
 const defaultAvatar = "public/anon-user.png";
@@ -15,39 +16,7 @@ async function fetchPosts(): Promise<PostDBType[] | undefined> {
   try {
     const { data } = await supabase
       .from("content")
-      .select(
-        `
-            id,
-            created_at,
-            updated_at,
-            created_by_id,
-            updated_by_id,
-            title,
-            description,
-            badges,
-            media_source,
-            media_type,
-            media_size,
-            media_name,
-            profiles (
-                id,
-                full_name,
-                avatar_url
-            ),
-            comments!post_id (
-              id,
-              content,
-              created_at,
-              user_id,
-              parent_comment_id,
-              profiles!comments_user_id_fkey (
-                id,
-                full_name,
-                avatar_url
-              )
-            )
-        `
-      )
+      .select(postQuery)
       .order("created_at", { ascending: false });
 
     if (data) {
@@ -78,13 +47,24 @@ async function fetchPosts(): Promise<PostDBType[] | undefined> {
   }
 }
 
+async function fetchUser(): Promise<User | null> {
+  const { data, error } = await supabase.auth.getSession();
+
+  if (error) {
+    throw error;
+  }
+
+  return data.session?.user || null;
+}
+
 export default function useGetPosts() {
   return useQuery<PostType[], Error>({
     queryKey: ["posts"],
     queryFn: async () => {
       const data = await fetchPosts();
+      const user = await fetchUser();
 
-      const posts = (data ?? []).map((datum) => ({
+      let posts = (data ?? []).map((datum) => ({
         id: datum.id,
         createdAt: formatTimestamp(datum.created_at),
         updatedAt: datum.updated_at,
@@ -99,18 +79,28 @@ export default function useGetPosts() {
           avatarURL: datum.profiles.avatar_url ?? defaultAvatar,
           name: datum.profiles.full_name ?? defaultName,
         },
+        commentCount: datum.comments.length ?? 0,
         comments: datum.comments.map((comment) => ({
           id: comment.id,
           userID: comment.user_id,
           parentCommentID: comment.parent_comment_id,
           content: comment.content,
           createdAt: formatTimestamp(comment.created_at ?? ""),
+          likeCount: comment.like_count[0].count ?? 0,
+          userHasLiked: user
+            ? comment.users_liked.some((like) => like.user_id === user.id)
+            : false,
           profile: {
             id: comment.profiles.id,
             avatarURL: comment.profiles.avatar_url ?? defaultAvatar,
             name: comment.profiles.full_name ?? defaultName,
           },
         })),
+      }));
+
+      posts = posts.map((post) => ({
+        ...post,
+        comments: buildCommentTree(post.comments),
       }));
 
       const mediaByPostId: Map<string, MediaType[]> = new Map();

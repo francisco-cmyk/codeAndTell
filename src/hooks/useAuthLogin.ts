@@ -9,6 +9,7 @@ export default function useAuthLogin() {
     mutationFn: async (provider: Provider) => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: provider, // Example: 'google', 'github', etc
+        options: { redirectTo: "http://localhost:5173/feed" },
       });
       if (error) {
         throw new Error(error.message);
