@@ -91,6 +91,7 @@ export default function useGetUserPostByID(params: Params) {
         title: data.title ?? "",
         description: data.description ?? "",
         badges: data.badges ?? [],
+        getHelp: data.getHelp ?? false,
         media: (data.media_source ?? []).map((source, index) => ({
           mediaSource: source ?? "",
           mediaSize: data.media_size ? data.media_size[index] : 0,

@@ -65,6 +65,7 @@ export default function useGetHelpPosts() {
         description: datum.description ?? "",
         badges: datum.badges ?? [],
         media: [],
+        getHelp: datum.getHelp ?? false,
         profile: {
           id: datum.profiles.id,
           avatarURL: datum.profiles.avatar_url ?? defaultAvatar,
