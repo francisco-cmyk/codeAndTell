@@ -50,6 +50,7 @@ export default function PostFormPage() {
         title: values.title,
         description: values.description,
         badges: values.badges,
+        getHelp: values.getHelp,
         ...media,
       },
       {
