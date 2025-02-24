@@ -173,6 +173,7 @@ export default function PostView() {
             onSubmit={handleSubmitComment}
           />
         </div>
+        <p className='text-sm pl-2 italic'>leave a comment </p>
       </section>
 
       <section className='commments 2xl:w-2/3 w-full pb-20'>
