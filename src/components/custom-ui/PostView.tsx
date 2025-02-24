@@ -27,6 +27,8 @@ export default function PostView() {
   const [comment, setComment] = useState("");
 
   const postId = searchParams.get("postID") ?? "";
+  // const commentID = searchParams.get("commentID") ?? ""; TODO: implement for page scroll
+
   const { data: post, isLoading: isLoadingPost } = useGetUserPostByID({
     postID: postId,
   });
@@ -173,6 +175,7 @@ export default function PostView() {
             onSubmit={handleSubmitComment}
           />
         </div>
+        <p className='text-sm pl-2 italic'>leave a comment </p>
       </section>
 
       <section className='commments 2xl:w-2/3 w-full pb-20'>
@@ -196,7 +199,7 @@ export default function PostView() {
 
 function PostSkeletion() {
   return (
-    <div className='w-full h-screen overflow-y-auto flex flex-col justify-start items-center no-scrollbar px-7 gap-y-4'>
+    <div className='w-full h-screen overflow-y-auto flex flex-col justify-start items-center no-scrollbar px-7 pt-4 gap-y-4'>
       <section className='post flex flex-col 2xl:w-2/3 w-full pt-8 gap-y-3'>
         <Skeleton className='w-full h-[50px]' />
         <Skeleton className='w-full h-[100px]' />

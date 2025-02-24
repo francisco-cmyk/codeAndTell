@@ -8,12 +8,15 @@ import {
   NavigationMenuList,
 } from "../ui-lib/NavigationMenu";
 import UserProfile from "./UserProfile";
+import { useAuthContext } from "../../context/auth";
+import Notifications from "./Notifications";
 
 type NavProps = {
   setLoginOpen: () => void;
 };
 
 export default function Nav(props: NavProps) {
+  const { user, isAuthenticated } = useAuthContext();
   const { isDarkMode, setIsDarkMode } = useDarkMode();
 
   return (
@@ -30,8 +33,13 @@ export default function Nav(props: NavProps) {
         </NavigationMenuList>
       </NavigationMenu>
 
-      <div className={`flex items-center mr-4`}>
-        <UserProfile setLoginOpen={props.setLoginOpen} />
+      <div className={`flex items-center gap-x-3`}>
+        <Notifications userID={user.id} />
+        <UserProfile
+          user={user}
+          isAuthenticated={isAuthenticated}
+          setLoginOpen={props.setLoginOpen}
+        />
         <Button
           size='icon'
           variant='ghost'

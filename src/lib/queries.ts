@@ -17,6 +17,7 @@ media_source,
 media_type,
 media_size,
 media_name,
+getHelp,
 profiles (
     id,
     full_name,

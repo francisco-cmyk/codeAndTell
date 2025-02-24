@@ -151,7 +151,7 @@ export default function LoginModal(props: LoginProps) {
                   key={`${_button.name}-${index}`}
                   disabled={_button.isDisabled}
                   variant='outline'
-                  className='rounded-lg  p-5 text-xs bg-transparent hover:bg-slate-200 dark:hover:bg-zinc-700  border-slate-700 dark:text-white dark:border-slate-50 font-semibold mb-2'
+                  className='rounded-lg border-[2px] p-5 text-xs bg-transparent hover:bg-slate-200 dark:hover:bg-zinc-700  border-slate-700 dark:text-white dark:border-slate-500 font-semibold mb-2 focus:ring-0 focus:outline-none'
                   onClick={() => OAuthLogin(_button.provider)}
                 >
                   <Avatar className='h-5 w-5'>
@@ -175,7 +175,7 @@ export default function LoginModal(props: LoginProps) {
                 <Input
                   type='email'
                   value={state.emailInput}
-                  className='mb-2 rounded-lg dark:border-slate-300'
+                  className='mb-2 rounded-lg dark:border-slate-500'
                   onChange={(e) => handleInputChange("email", e.target.value)}
                 />
               </div>
@@ -187,7 +187,7 @@ export default function LoginModal(props: LoginProps) {
                   id='password'
                   type={state.showPassword ? "text" : "password"}
                   value={state.passwordInput}
-                  className='mb-2 rounded-lg dark:border-slate-300'
+                  className='mb-2 rounded-lg dark:border-slate-500'
                   onChange={(e) =>
                     handleInputChange("password", e.target.value)
                   }

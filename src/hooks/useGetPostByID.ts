@@ -6,6 +6,7 @@ import { PostgrestError, User } from "@supabase/supabase-js";
 import { PostSchema } from "../lib/schemas";
 import { PostType } from "../lib/types";
 import { postQuery } from "../lib/queries";
+import { fetchUser } from "./useGetUserBasic";
 
 const defaultName = "Anon";
 const defaultAvatar = "public/anon-user.png";
@@ -58,16 +59,6 @@ export async function fetchUserPostByID(
   }
 }
 
-async function fetchUser(): Promise<User | null> {
-  const { data, error } = await supabase.auth.getSession();
-
-  if (error) {
-    throw error;
-  }
-
-  return data.session?.user || null;
-}
-
 type Params = {
   postID: string;
   userID?: string;
@@ -100,6 +91,7 @@ export default function useGetUserPostByID(params: Params) {
         title: data.title ?? "",
         description: data.description ?? "",
         badges: data.badges ?? [],
+        getHelp: data.getHelp ?? false,
         media: (data.media_source ?? []).map((source, index) => ({
           mediaSource: source ?? "",
           mediaSize: data.media_size ? data.media_size[index] : 0,

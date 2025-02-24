@@ -1,11 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../config/supabaseConfig";
 import { z, ZodError } from "zod";
-import { formatTimestamp, showToast } from "../lib/utils";
+import { buildCommentTree, formatTimestamp, showToast } from "../lib/utils";
 import { PostgrestError } from "@supabase/supabase-js";
 import { MediaType, PostType } from "../lib/types";
 import { PostSchema } from "../lib/schemas";
 import { postQuery } from "../lib/queries";
+import { fetchUser } from "./useGetUserBasic";
 
 const defaultName = "Anon";
 const defaultAvatar = "public/anon-user.png";
@@ -52,8 +53,9 @@ export default function useGetHelpPosts() {
     queryKey: ["help-posts"],
     queryFn: async () => {
       const data = await fetchHelpPosts();
+      const user = await fetchUser();
 
-      const posts = (data ?? []).map((datum) => ({
+      let posts = (data ?? []).map((datum) => ({
         id: datum.id,
         createdAt: formatTimestamp(datum.created_at),
         updatedAt: datum.updated_at,
@@ -63,11 +65,13 @@ export default function useGetHelpPosts() {
         description: datum.description ?? "",
         badges: datum.badges ?? [],
         media: [],
+        getHelp: datum.getHelp ?? false,
         profile: {
           id: datum.profiles.id,
           avatarURL: datum.profiles.avatar_url ?? defaultAvatar,
           name: datum.profiles.full_name ?? defaultName,
         },
+        commentCount: datum.comments.length ?? 0,
         comments: datum.comments.map((comment) => ({
           id: comment.id,
           userID: comment.user_id,
@@ -75,13 +79,20 @@ export default function useGetHelpPosts() {
           content: comment.content,
           createdAt: formatTimestamp(comment.created_at ?? ""),
           likeCount: comment.like_count[0].count ?? 0,
-          userHasLiked: false,
+          userHasLiked: user
+            ? comment.users_liked.some((like) => like.user_id === user.id)
+            : false,
           profile: {
             id: comment.profiles.id,
             avatarURL: comment.profiles.avatar_url ?? defaultAvatar,
             name: comment.profiles.full_name ?? defaultName,
           },
         })),
+      }));
+
+      posts = posts.map((post) => ({
+        ...post,
+        comments: buildCommentTree(post.comments),
       }));
 
       const mediaByPostId: Map<string, MediaType[]> = new Map();

@@ -9,7 +9,7 @@ export const PostSchema = z.object({
   title: z.nullable(z.string()),
   description: z.nullable(z.string()),
   badges: z.nullable(z.array(z.string())),
-  getHelp: z.nullable(z.boolean().default(false)),
+  getHelp: z.nullable(z.boolean()),
   media_source: z.nullable(z.array(z.string())),
   media_size: z.nullable(z.array(z.number())),
   media_name: z.nullable(z.array(z.string())),

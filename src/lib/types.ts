@@ -76,3 +76,19 @@ export type Tags = {
   label: string;
   icon: React.FC<React.SVGProps<SVGSVGElement>>;
 };
+
+export type NotificationType = {
+  id: number;
+  userID: string;
+  postID: string;
+  commentID: number;
+  type: string;
+  read: boolean;
+  createdAt: string;
+  createdByID: string;
+  profile: {
+    id: string;
+    avatarURL: string;
+    name: string;
+  };
+};

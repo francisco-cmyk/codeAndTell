@@ -2,10 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../config/supabaseConfig";
 import { z, ZodError } from "zod";
 import { buildCommentTree, formatTimestamp, showToast } from "../lib/utils";
-import { PostgrestError, User } from "@supabase/supabase-js";
+import { PostgrestError } from "@supabase/supabase-js";
 import { MediaType, PostType } from "../lib/types";
 import { PostSchema } from "../lib/schemas";
 import { postQuery } from "../lib/queries";
+import { fetchUser } from "./useGetUserBasic";
 
 const defaultName = "Anon";
 const defaultAvatar = "public/anon-user.png";
@@ -47,16 +48,6 @@ async function fetchPosts(): Promise<PostDBType[] | undefined> {
   }
 }
 
-async function fetchUser(): Promise<User | null> {
-  const { data, error } = await supabase.auth.getSession();
-
-  if (error) {
-    throw error;
-  }
-
-  return data.session?.user || null;
-}
-
 export default function useGetPosts() {
   return useQuery<PostType[], Error>({
     queryKey: ["posts"],
@@ -74,6 +65,7 @@ export default function useGetPosts() {
         description: datum.description ?? "",
         badges: datum.badges ?? [],
         media: [],
+        getHelp: datum.getHelp ?? false,
         profile: {
           id: datum.profiles.id,
           avatarURL: datum.profiles.avatar_url ?? defaultAvatar,
