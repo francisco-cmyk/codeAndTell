@@ -7,6 +7,7 @@ type Params = {
   title: string;
   description: string;
   badges: string[];
+  getHelp: boolean;
   mediaName: string[] | null;
   mediaType: string[] | null;
   mediaSize: number[] | null;
@@ -32,6 +33,7 @@ export default function useCreatePost() {
           title: params.title,
           description: params.description,
           badges: params.badges,
+          getHelp: params.getHelp,
           media_source: params.mediaSource,
           media_type: params.mediaType,
           media_size: params.mediaSize,

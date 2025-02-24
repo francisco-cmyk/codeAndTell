@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { getEmbedURL, showToast, urlToFile } from "../../lib/utils";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../ui-lib/Tabs";
 import { Button } from "../ui-lib/Button";
+import { Checkbox } from "../ui-lib/Checkbox";
 import {
   FormField,
   FormItem,
@@ -41,7 +42,7 @@ const formSchema = z.object({
   description: z.string().min(2, "Please add a description").max(5000),
   media: z.array(z.any()),
   badges: z.string().array().min(1, "Select at least once badge").max(3),
-  needHelp: z.boolean().default(false),
+  getHelp: z.boolean().default(false),
   mediaLink: z.string().optional(),
 });
 
@@ -54,7 +55,7 @@ export default function PostForm({ post, onSubmit }: FormProps) {
       title: "",
       description: "",
       badges: [],
-      needHelp: false,
+      getHelp: false,
       media: [],
       mediaLink: "",
     },
@@ -159,7 +160,7 @@ export default function PostForm({ post, onSubmit }: FormProps) {
                     options={tagList}
                     defaultValue={badges}
                     onValueChange={(value) => {
-                      form.setValue("badges", value);
+                      form.setValue('badges', value);
                     }}
                     placeholder='Select badges'
                     variant='inverted'
@@ -171,11 +172,11 @@ export default function PostForm({ post, onSubmit }: FormProps) {
             />
             <FormField
               control={form.control}
-              name='needHelp'
+              name='getHelp'
               render={({ field }) => (
-                <FormItem className='mt-2 flex flex-row space-x-6'>
-                  <FormLabel id='needHelp' className="">Need Help?</FormLabel>
-                  <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                <FormItem className='mt-2 flex flex-row'>
+                  <FormLabel id='getHelp' className=''>Need Help?</FormLabel>
+                  <Checkbox className='' checked={field.value} onCheckedChange={field.onChange} />
                 </FormItem>
               )}
             />
