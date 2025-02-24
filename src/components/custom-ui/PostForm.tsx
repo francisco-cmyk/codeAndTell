@@ -41,7 +41,8 @@ const formSchema = z.object({
   title: z.string().min(2, "Title must be atleast 2 characters").max(50),
   description: z.string().min(2, "Please add a description").max(5000),
   media: z.array(z.any()),
-  badges: z.string().array().min(1, "Select atleast once badge").max(3),
+  badges: z.string().array().min(1, "Select at least once badge").max(3),
+  needHelp: z.boolean().default(false),
   mediaLink: z.string().optional(),
 });
 
@@ -54,6 +55,7 @@ export default function PostForm({ post, onSubmit }: FormProps) {
       title: "",
       description: "",
       badges: [],
+      needHelp: false,
       media: [],
       mediaLink: "",
     },
@@ -165,6 +167,16 @@ export default function PostForm({ post, onSubmit }: FormProps) {
                     animation={2}
                     maxCount={3}
                   />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name='needHelp'
+              render={({ field }) => (
+                <FormItem className='mt-2 flex flex-row space-x-6'>
+                  <FormLabel id='needHelp' className="">Need Help?</FormLabel>
+                  <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                 </FormItem>
               )}
             />
