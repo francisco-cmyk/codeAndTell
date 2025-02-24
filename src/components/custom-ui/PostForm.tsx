@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { getEmbedURL, showToast, urlToFile } from "../../lib/utils";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../ui-lib/Tabs";
 import { Button } from "../ui-lib/Button";
-import { Checkbox } from "../ui-lib/Checkbox";
 import {
   FormField,
   FormItem,
@@ -18,7 +17,7 @@ import { Input } from "../ui-lib/Input";
 import { MultiSelect } from "../ui-lib/MultiSelect";
 import DragAndDrop from "./DragAndDrop";
 import TiptapEditor from "./TipTapEditor";
-import { SinglePostType } from "../../lib/types";
+import { PostType } from "../../lib/types";
 
 const tagList = [
   { value: "discord", label: "discord" },
@@ -33,7 +32,7 @@ const tagList = [
 ];
 
 type FormProps = {
-  post?: SinglePostType;
+  post?: PostType;
   onSubmit: (values: z.infer<typeof formSchema>) => void;
 };
 

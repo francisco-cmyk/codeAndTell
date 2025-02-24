@@ -232,7 +232,7 @@ export default function CommentsSection(props: CommentSectionProps) {
 
               <p className='text-xs mb-2'>{comment.profile.name}</p>
             </div>
-            <p className='pl-4 pb-2 mt-2'>{htmlParser(comment.content)}</p>
+            <div className='pl-4 pb-2 mt-2'>{htmlParser(comment.content)}</div>
             <span className='text-xs text-right'>{comment.createdAt}</span>
             <Separator className='mt-2 ' />
           </div>

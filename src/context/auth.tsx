@@ -91,10 +91,6 @@ export const AuthenticationProvider: React.FC<ProviderPops> = ({
     };
   }, []);
 
-  // function handleLoginOpen(val?: boolean) {
-  //   setIsLoginOpen(val ?? !isLoginOpen);
-  // }
-
   return (
     <AuthContextProvider.Provider
       value={{ isAuthenticated, user, isLoginOpen, setIsLoginOpen }}
