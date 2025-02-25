@@ -34,7 +34,7 @@ export default function Nav(props: NavProps) {
       </NavigationMenu>
 
       <div className={`flex items-center gap-x-3`}>
-        <Notifications userID={user.id} />
+        <Notifications userID={user.id} isAuthenticated={isAuthenticated} />
         <UserProfile
           user={user}
           isAuthenticated={isAuthenticated}

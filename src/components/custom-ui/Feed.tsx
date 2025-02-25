@@ -22,12 +22,11 @@ import { Trash2, MessageCircle, PencilIcon } from "lucide-react";
 import { Button } from "../ui-lib/Button";
 import { useAuthContext } from "../../context/auth";
 import useDeletePost from "../../hooks/useDeletePost";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import DeleteDialog from "./DeleteDialog";
 import { htmlParser } from "../../lib/parser";
 import BackgroundImage from "./BackgroundImage";
-import { useSearchParams } from "react-router-dom";
 
 type FeedProps = {
   isLoading: boolean;
@@ -39,7 +38,6 @@ type FeedProps = {
 };
 
 export default function Feed(props: FeedProps) {
-  const [searchParams, setSearchParams] = useSearchParams();
   const [deletePostID, setDeletePostID] = useState<string | null>(null);
 
   const { user } = useAuthContext();
@@ -52,23 +50,6 @@ export default function Feed(props: FeedProps) {
   const isUserPost = props.isUserPost ?? false;
 
   const placeholders = Array.from(Array(3).keys());
-  const searchParamComView = searchParams.get("comView") ?? "";
-
-  useEffect(() => {
-    // Effect to scroll post into view on page reload
-    const postID = searchParamComView;
-    const element = postRefs.current[postID];
-
-    if (postID && element) {
-      const parent = element.parentElement;
-      if (parent) {
-        parent.scrollTo({
-          top: element.offsetTop - 100,
-          behavior: "smooth",
-        });
-      }
-    }
-  }, [searchParamComView, props.posts]);
 
   if (props.posts.length === 0 && !props.isLoading) {
     return (
@@ -87,9 +68,8 @@ export default function Feed(props: FeedProps) {
   }
 
   function handleCommentSelect(id: string) {
-    if (props.onCommentSelect) {
-      setSearchParams({ comView: id });
-      props.onCommentSelect(id);
+    if (props.onSelect) {
+      props.onSelect(id);
     }
   }
 
@@ -237,7 +217,7 @@ export default function Feed(props: FeedProps) {
                 <div className='flex items-center min-w-16 rounded-md pt-1'>
                   <Button
                     variant='ghost'
-                    className='flex items-center hover:bg-zinc-100 dark:hover:bg-zinc-600 p-2 '
+                    className='flex items-center hover:bg-zinc-100 dark:hover:bg-zinc-600 p-2'
                     onClick={(e) => {
                       e.stopPropagation();
                       handleCommentSelect(post.id);

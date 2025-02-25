@@ -9,19 +9,32 @@ import {
 import { Button } from "../ui-lib/Button";
 
 const Variant = {
-  post: "post",
+  account: "account",
   comment: "comment",
+  custom: "custom",
+  post: "post",
 } as const;
 
 type Variant = keyof typeof Variant;
 
-type DeleteDialogProps = {
+type BaseProps = {
   isOpen: boolean;
   isLoading?: boolean;
-  variant?: Variant;
   handleDelete: () => void;
   onClose: () => void;
 };
+
+type NonCustomVariantProps = BaseProps & {
+  variant?: Exclude<Variant, "custom">;
+  message?: never; // Prevents message from being used
+};
+// Variant when it's "custom"
+type CustomVariantProps = BaseProps & {
+  variant: "custom";
+  message: string;
+};
+
+type DeleteDialogProps = NonCustomVariantProps | CustomVariantProps;
 
 export default function DeleteDialog(props: DeleteDialogProps) {
   const variant = props.variant ?? Variant.post;
@@ -33,6 +46,13 @@ export default function DeleteDialog(props: DeleteDialogProps) {
       }
       case Variant.comment: {
         return "This will permanently delete this comment. Once deleted your comment will be gone forever.";
+      }
+      case Variant.account: {
+        return "This will permanently delete your account. Once deleted your account will be gone forever.";
+      }
+      case Variant.custom: {
+        if (props.message) return props.message;
+        return "This action is permanent and cannot be undone.";
       }
     }
   }
