@@ -18,6 +18,7 @@ async function fetchPosts(): Promise<PostDBType[] | undefined> {
     const { data } = await supabase
       .from("content")
       .select(postQuery)
+      .eq("getHelp", false)
       .order("created_at", { ascending: false });
 
     if (data) {

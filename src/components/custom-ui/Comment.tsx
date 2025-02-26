@@ -39,7 +39,7 @@ type CommentProps = {
 };
 
 const Comment = forwardRef<HTMLDivElement, CommentProps>(
-  ({ comment, userID, querykey, postID, isPanel, commentsRef, onReply }, _) => {
+  ({ comment, userID, querykey, postID, isPanel, commentsRef, onReply }, ) => {
     const queryClient = useQueryClient();
     const [showEditor, setShowEditor] = useState<boolean>(false);
     const [commentText, setCommentText] = useState<string>("");
