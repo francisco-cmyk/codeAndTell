@@ -92,3 +92,19 @@ export type NotificationType = {
     name: string;
   };
 };
+
+export type UserType = {
+  id: string;
+  name: string;
+  preferredName: string;
+  userName: string;
+  avatarUrl: string;
+  bio: string;
+  email: string;
+  role: string;
+  lastSignInAt: string;
+  provider: string;
+  providers: string[];
+  isEmailVerified: boolean;
+  isPhoneVerified: boolean;
+};

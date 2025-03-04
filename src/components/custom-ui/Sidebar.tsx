@@ -20,14 +20,6 @@ export default function Sidebar() {
               allProjects
             </Link>
             <Link
-              to='/myPosts'
-              className={`${
-                pathname === "/myPosts" ? "bg-slate-200 dark:bg-accent" : ""
-              } group flex h-8 w-full items-center rounded-lg px-2 font-normal text-foreground underline-offset-2 hover:bg-slate-200 dark:hover:bg-accent hover:text-accent-foreground`}
-            >
-              myPosts
-            </Link>
-            <Link
               to='/ask4help'
               className={`${
                 pathname === "/ask4help" ? "bg-slate-200 dark:bg-accent" : ""
@@ -35,15 +27,6 @@ export default function Sidebar() {
             >
               askForHelp
             </Link>
-
-            {/* <Link
-              to='/rateMyProject'
-              className={`${
-                pathname === "/rateMyProject" ? "bg-slate-200 dark:bg-accent" : ""
-              } group flex h-8 w-full items-center rounded-lg px-2 font-normal text-foreground underline-offset-2 hover:bg-slate-200 dark:hover:bg-accent hover:text-accent-foreground`}
-            >
-              rateMyProject
-            </Link> */}
           </div>
         </div>
       </div>

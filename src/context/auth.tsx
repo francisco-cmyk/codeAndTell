@@ -8,17 +8,11 @@ import React, {
 import { supabase } from "../config/supabaseConfig";
 import useGetSession from "../hooks/useGetSession";
 import useGetUser from "../hooks/useGetUser";
-
-type User = {
-  id: string;
-  name: string;
-  avatarUrl: string;
-  email: string;
-};
+import { UserType } from "../lib/types";
 
 type AuthContextType = {
   isAuthenticated: boolean;
-  user: User;
+  user: UserType;
   isLoginOpen: boolean;
   setIsLoginOpen: (val: boolean) => void;
 };
@@ -31,18 +25,27 @@ type ProviderPops = {
   children: ReactNode;
 };
 
-const initialUser: User = {
+const initialUser: UserType = {
   id: "",
-  name: "NPC",
+  name: "",
   avatarUrl: "public/anon-user.png",
   email: "",
+  preferredName: "",
+  userName: "",
+  bio: "",
+  role: "",
+  lastSignInAt: "",
+  provider: "",
+  providers: [],
+  isEmailVerified: false,
+  isPhoneVerified: false,
 };
 
 export const AuthenticationProvider: React.FC<ProviderPops> = ({
   children,
 }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<User>(initialUser);
+  const [user, setUser] = useState<UserType>(initialUser);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
 
   const { data: session, refetch: refetchSession } = useGetSession();
@@ -60,10 +63,9 @@ export const AuthenticationProvider: React.FC<ProviderPops> = ({
       setIsAuthenticated(true);
 
       setUser({
-        id: userData.id,
-        name: userData.full_name ?? initialUser.name,
-        avatarUrl: userData.avatar_url ?? "public/profile-boy-icon.png",
-        email: userData.email,
+        ...userData,
+        name: userData.name ?? userData.preferredName,
+        avatarUrl: userData.avatarUrl ?? "public/profile-boy-icon.png",
       });
     }
   }, [session, userData]);

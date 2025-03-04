@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../config/supabaseConfig";
 import { z } from "zod";
 import { buildCommentTree, formatTimestamp, showToast } from "../lib/utils";
-import { PostgrestError, User } from "@supabase/supabase-js";
+import { PostgrestError } from "@supabase/supabase-js";
 import { PostSchema } from "../lib/schemas";
 import { PostType } from "../lib/types";
 import { postQuery } from "../lib/queries";

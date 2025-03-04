@@ -81,6 +81,18 @@
   }
 }
 
+*:focus,
+*:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+[data-focus],
+[data-hover],
+[data-state="active"] {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 .editor-content [contenteditable] {
   min-height: 150px;
   max-height: 250px;
