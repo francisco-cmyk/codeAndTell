@@ -43,7 +43,7 @@ const formSchema = z.object({
   description: z.string().min(2, "Please add a description").max(5000),
   media: z.array(z.any()),
   badges: z.string().array().min(1, "Select at least once badge").max(3),
-  getHelp: z.boolean().default(false),
+  getHelp: z.boolean(),
   mediaLink: z.string().optional(),
 });
 
@@ -56,7 +56,7 @@ export default function PostForm({ post, onSubmit }: FormProps) {
       title: "",
       description: "",
       badges: [],
-      getHelp: false,
+      getHelp: undefined,
       media: [],
       mediaLink: "",
     },

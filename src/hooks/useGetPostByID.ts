@@ -29,7 +29,7 @@ export async function fetchUserPostByID(
     if (data) {
       return PostSchema.parse(data[0]);
     } else {
-      [];
+      return undefined;
     }
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -91,7 +91,7 @@ export default function useGetUserPostByID(params: Params) {
         title: data.title ?? "",
         description: data.description ?? "",
         badges: data.badges ?? [],
-        getHelp: data.getHelp ?? false,
+        getHelp: data.getHelp,
         media: (data.media_source ?? []).map((source, index) => ({
           mediaSource: source ?? "",
           mediaSize: data.media_size ? data.media_size[index] : 0,

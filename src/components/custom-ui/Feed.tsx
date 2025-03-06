@@ -212,18 +212,24 @@ export default function Feed(props: FeedProps) {
                       {badge}
                     </Badge>
                   ))}
-                  {post.getHelp === false && post.getHelp !== null ?
-                    <Badge
-                      variant={"outline"}
-                      className={`mr-2 text-lime-500 dark:border-lime-500`}>
-                      Resolved!
-                    </Badge>
+                  {post.getHelp === null ?
+                    <></>
                     :
-                    <Badge
-                      variant={"outline"}
-                      className={`mr-2 text-red-500 dark:border-red-500`}>
-                      Help!
-                    </Badge>
+                    post.getHelp ?
+                      <Badge
+                        variant={"outline"}
+                        className={`mr-2 text-red-500 dark:border-red-500`}>
+                        Help!
+                      </Badge>
+                      :
+                      !post.getHelp && post.getHelp !== null ?
+                        <Badge
+                          variant={"outline"}
+                          className={`mr-2 text-lime-500 dark:border-lime-500`}>
+                          Resolved!
+                        </Badge>
+                        :
+                        <></>
                   }
                 </div>
 

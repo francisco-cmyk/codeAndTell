@@ -18,7 +18,7 @@ async function fetchHelpPosts(): Promise<PostDBType[] | undefined> {
     const { data } = await supabase
       .from("content")
       .select(postQuery)
-      .eq("getHelp", true)
+      .not("getHelp", 'is', null)
       .order("created_at", { ascending: false });
       console.log("DATA", data)
 
@@ -66,7 +66,7 @@ export default function useGetHelpPosts() {
         description: datum.description ?? "",
         badges: datum.badges ?? [],
         media: [],
-        getHelp: datum.getHelp ?? false,
+        getHelp: datum.getHelp,
         profile: {
           id: datum.profiles.id,
           avatarURL: datum.profiles.avatar_url ?? defaultAvatar,

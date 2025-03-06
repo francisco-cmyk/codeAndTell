@@ -22,7 +22,7 @@ export type PostType = {
   title: string;
   description: string;
   badges: string[];
-  getHelp: boolean;
+  getHelp: boolean | null;
   media: MediaType[];
   profile: {
     id: string;
