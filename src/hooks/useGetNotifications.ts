@@ -35,7 +35,8 @@ async function fetchNotifications(userID: string) {
         `*,
         profile:profiles (id, full_name, avatar_url)`
       )
-      .eq("user_id", userID);
+      .eq("user_id", userID)
+      .order("created_at", { ascending: false });
 
     if (error) {
       throw error;

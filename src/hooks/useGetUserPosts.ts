@@ -70,6 +70,7 @@ export default function useGetUserPosts(params: Params) {
         badges: datum.badges ?? [],
         getHelp: datum.getHelp ?? false,
         media: [],
+        getHelp: datum.getHelp ?? false,
         profile: {
           id: datum.profiles.id,
           avatarURL: datum.profiles.avatar_url ?? defaultAvatar,

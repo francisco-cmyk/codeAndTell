@@ -32,6 +32,7 @@ type NotifType = keyof typeof NotifType;
 
 type NotificationProps = {
   userID: string;
+  isAuthenticated: boolean;
 };
 
 export default function Notifications(props: NotificationProps) {
@@ -82,6 +83,10 @@ export default function Notifications(props: NotificationProps) {
     return accum;
   }, 0);
 
+  if (!props.isAuthenticated) {
+    return null;
+  }
+
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger className='p-1'>
@@ -96,7 +101,7 @@ export default function Notifications(props: NotificationProps) {
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align='center'
-        className=' p-1 mr-3 cursor-pointer max-h-[600px]'
+        className=' p-1 mr-3 cursor-pointer max-h-[600px] min-w-52'
       >
         <DropdownMenuLabel className='font-medium text-sm'>
           notifications
