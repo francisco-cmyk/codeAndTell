@@ -13,6 +13,7 @@ import {
   FormDescription,
   FormControl,
   Form,
+  FormMessage,
 } from "../ui-lib/Form";
 import { Input } from "../ui-lib/Input";
 import { MultiSelect } from "../ui-lib/MultiSelect";
@@ -175,8 +176,11 @@ export default function PostForm({ post, onSubmit }: FormProps) {
               name='getHelp'
               render={({ field }) => (
                 <FormItem className='mt-2 flex flex-row'>
-                  <FormLabel id='getHelp' className=''>Need Help?</FormLabel>
+                  <FormLabel id='getHelp' className=''> Need Help? </FormLabel>
                   <Checkbox className='' checked={field.value} onCheckedChange={field.onChange} />
+                  <FormMessage className="ml-4 text-lime-500">
+                    When your question is answered, remember to edit your post and mark it as resolved!
+                  </FormMessage>
                 </FormItem>
               )}
             />
