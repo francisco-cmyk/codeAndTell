@@ -3,8 +3,7 @@ import cx from "clsx";
 
 const DefaultDate = new Date();
 
-interface CustomToastProps
-  extends ToastContentProps<{ title: string; content: string }> {}
+type CustomToastProps = ToastContentProps<{ title: string; content: string }>
 
 export default function CustomToast({ data }: CustomToastProps) {
   if (!data) return null;
