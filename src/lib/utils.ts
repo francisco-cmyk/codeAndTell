@@ -103,7 +103,7 @@ export function createAcronym(name: string, length = 2) {
   }
 
   const words = name.trim().split(/\s+/);
-  let acronym = words.map((word) => word[0].toUpperCase()).join("");
+  const acronym = words.map((word) => word[0].toUpperCase()).join("");
 
   return acronym.slice(0, length);
 }
@@ -115,7 +115,7 @@ export function createAcronym(name: string, length = 2) {
 // T - TS generic that works with any input object
 // Partial - TS util type that makes input types optional
 // Record - TS util type that defines specific types for keys and values with generic
-export function getDiff<T extends Record<string, any>>(
+export function getDiff<T extends Record<string, unknown>>(
   original: T,
   updated: T
 ): Partial<T> {
@@ -185,7 +185,7 @@ export function getLinkType(link: string): string {
 
 export function getEmbedURL(url: string) {
   const youtubeRegex =
-    /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/;
+    /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/ ]{11})/;
   const vimeoRegex = /vimeo\.com\/(\d+)/;
 
   const youtubeMatch = url.match(youtubeRegex);
@@ -211,7 +211,6 @@ type Comment = {
   createdAt: string;
   likeCount: number;
   parentCommentID: number | null;
-  // replies: Comment[];
   userHasLiked: boolean;
   profile: {
     id: string;

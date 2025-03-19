@@ -18,6 +18,7 @@ async function fetchPosts(): Promise<PostDBType[] | undefined> {
     const { data } = await supabase
       .from("content")
       .select(postQuery)
+      .is("getHelp", null)
       .order("created_at", { ascending: false });
 
     if (data) {
@@ -53,6 +54,7 @@ export default function useGetPosts() {
     queryKey: ["posts"],
     queryFn: async () => {
       const data = await fetchPosts();
+      console.log(data);
       const user = await fetchUser();
 
       let posts = (data ?? []).map((datum) => ({
@@ -65,7 +67,7 @@ export default function useGetPosts() {
         description: datum.description ?? "",
         badges: datum.badges ?? [],
         media: [],
-        getHelp: datum.getHelp ?? false,
+        getHelp: datum.getHelp,
         profile: {
           id: datum.profiles.id,
           avatarURL: datum.profiles.avatar_url ?? defaultAvatar,

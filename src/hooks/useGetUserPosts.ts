@@ -25,7 +25,7 @@ async function fetchUserPosts(
     if (data) {
       return data.map((datum) => PostSchema.parse(datum));
     } else {
-      [];
+      return [];
     }
   } catch (error) {
     if (error instanceof ZodError) {
@@ -68,8 +68,8 @@ export default function useGetUserPosts(params: Params) {
         title: datum.title ?? "",
         description: datum.description ?? "",
         badges: datum.badges ?? [],
+        getHelp: datum.getHelp,
         media: [],
-        getHelp: datum.getHelp ?? false,
         profile: {
           id: datum.profiles.id,
           avatarURL: datum.profiles.avatar_url ?? defaultAvatar,

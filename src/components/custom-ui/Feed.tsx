@@ -27,6 +27,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import DeleteDialog from "./DeleteDialog";
 import { htmlParser } from "../../lib/parser";
 import BackgroundImage from "./BackgroundImage";
+import useResolveHelpPost from "../../hooks/useResolveHelpPost";
 
 type FeedProps = {
   isLoading: boolean;
@@ -44,6 +45,7 @@ export default function Feed(props: FeedProps) {
   const queryClient = useQueryClient();
 
   const { mutate: deletePost } = useDeletePost();
+  const { mutate: resolveHelpPost } = useResolveHelpPost();
 
   const postRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
@@ -96,9 +98,23 @@ export default function Feed(props: FeedProps) {
     );
   }
 
+  function handleResolveHelpPost(postID: string) {
+    resolveHelpPost(
+      {
+        postID: postID,
+        userID: user.id,
+        getHelp: false
+      },
+      {
+        onSuccess: () => {
+        },
+      }
+    );
+  }
+
   return (
     <div
-      className={`min-w-[700px] max-w-3xl h-full grid grid-cols-1 gap-y-12 p-3 pb-44 place-self-center overflow-y-auto no-scrollbar cursor-pointer`}
+      className={`sm:min-w-[300px] md:min-w-[700px] max-w-3xl h-full grid grid-cols-1 gap-y-12 p-3 pb-44 place-self-center overflow-y-auto no-scrollbar cursor-pointer`}
     >
       <DeleteDialog
         isOpen={!!deletePostID}
@@ -120,7 +136,14 @@ export default function Feed(props: FeedProps) {
               onClick={() => handleSelectPost(post.id)}
             >
               <CardHeader>
-                <CardTitle className={`text-2xl mb-1`}>{post.title}</CardTitle>
+                <div className="w-full flex flex-row border-red-900 border-solid border-2">
+                  <CardTitle className={`text-2xl mb-1`}>{post.title}</CardTitle>
+                  { post.getHelp === true ?
+                    <Button className="" onClick={() => handleResolveHelpPost(post.id)}> Resolve </Button>
+                    :
+                    <></>
+                  }
+                </div>
                 <CardDescription className='w-full flex justify-between text-xs '>
                   <div className='flex items-center'>
                     <Avatar className='h-5 w-5 mr-2'>
@@ -212,6 +235,25 @@ export default function Feed(props: FeedProps) {
                       {badge}
                     </Badge>
                   ))}
+                  {post.getHelp === null ?
+                    <></>
+                    :
+                    post.getHelp ?
+                      <Badge
+                        variant={"outline"}
+                        className={`mr-2 text-red-500 dark:border-red-500`}>
+                        Help!
+                      </Badge>
+                      :
+                      !post.getHelp && post.getHelp !== null ?
+                        <Badge
+                          variant={"outline"}
+                          className={`mr-2 text-lime-500 dark:border-lime-500`}>
+                          Resolved!
+                        </Badge>
+                        :
+                        <></>
+                  }
                 </div>
 
                 <div className='flex items-center min-w-16 rounded-md pt-1'>
