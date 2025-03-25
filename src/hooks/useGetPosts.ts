@@ -54,7 +54,6 @@ export default function useGetPosts() {
     queryKey: ["posts"],
     queryFn: async () => {
       const data = await fetchPosts();
-      console.log(data);
       const user = await fetchUser();
 
       let posts = (data ?? []).map((datum) => ({

@@ -32,7 +32,8 @@ export default function PostView() {
   const { data: post, isLoading: isLoadingPost } = useGetUserPostByID({
     postID: postId,
   });
-  const { mutate: postComment } = usePostComment();
+  const { mutate: postComment, isPending: isPendingPostComment } =
+    usePostComment();
 
   function handleSubmitComment() {
     if (!comment.trim() || !postId) {
@@ -171,6 +172,7 @@ export default function PostView() {
           <TiptapEditor
             variant='small'
             value={comment}
+            isLoading={isPendingPostComment}
             onChange={(value) => setComment(value)}
             onSubmit={handleSubmitComment}
           />

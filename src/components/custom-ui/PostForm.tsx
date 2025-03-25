@@ -102,6 +102,7 @@ export default function PostForm({ post, onSubmit }: FormProps) {
         description: post.description ?? "",
         badges: post.badges ?? [],
         media: files,
+        mediaLink: post.media[0].mediaSource,
       }));
     }
 
@@ -161,7 +162,7 @@ export default function PostForm({ post, onSubmit }: FormProps) {
                     options={tagList}
                     defaultValue={badges}
                     onValueChange={(value) => {
-                      form.setValue('badges', value);
+                      form.setValue("badges", value);
                     }}
                     placeholder='Select badges'
                     variant='inverted'
@@ -171,19 +172,28 @@ export default function PostForm({ post, onSubmit }: FormProps) {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name='getHelp'
-              render={({ field }) => (
-                <FormItem className='mt-2 flex flex-row'>
-                  <FormLabel id='getHelp' className=''> Need Help? </FormLabel>
-                  <Checkbox className='' checked={field.value} onCheckedChange={field.onChange} />
-                  <FormMessage className="ml-4 text-lime-500">
-                    When your question is answered, remember to edit your post and mark it as resolved!
-                  </FormMessage>
-                </FormItem>
-              )}
-            />
+            {post && post.getHelp !== null ? (
+              <FormField
+                control={form.control}
+                name='getHelp'
+                render={({ field }) => (
+                  <FormItem className='mt-2 flex flex-row items-center'>
+                    <FormLabel id='getHelp' className=''>
+                      Need Help?
+                    </FormLabel>
+                    <Checkbox
+                      className=''
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                    <FormMessage className='ml-4 text-lime-500'>
+                      When your question is answered, remember to edit your post
+                      and mark it as resolved!
+                    </FormMessage>
+                  </FormItem>
+                )}
+              />
+            ) : null}
           </TabsContent>
           <TabsContent
             value='multimedia'
@@ -201,6 +211,7 @@ export default function PostForm({ post, onSubmit }: FormProps) {
                   <FormControl>
                     <DragAndDrop
                       values={mediaFiles}
+                      link={mediaLink}
                       onChange={(files) => setValue("media", files)}
                     />
                   </FormControl>
@@ -220,7 +231,6 @@ export default function PostForm({ post, onSubmit }: FormProps) {
                         placeholder='paste video link (Youtube, Vimeo, MP4)..'
                         type='text'
                         value={field.value}
-                        disabled={mediaFiles.length > 0}
                         onChange={field.onChange}
                       />
                       {mediaLink && (

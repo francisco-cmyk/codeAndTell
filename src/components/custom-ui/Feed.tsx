@@ -103,19 +103,16 @@ export default function Feed(props: FeedProps) {
       {
         postID: postID,
         userID: user.id,
-        getHelp: false
+        getHelp: false,
       },
       {
-        onSuccess: () => {
-        },
+        onSuccess: () => {},
       }
     );
   }
 
   return (
-    <div
-      className={`sm:min-w-[300px] md:min-w-[700px] max-w-3xl h-full grid grid-cols-1 gap-y-12 p-3 pb-44 place-self-center overflow-y-auto no-scrollbar cursor-pointer`}
-    >
+    <div className='sm:min-w-[300px] md:min-w-[700px] max-w-3xl w-full h-screen grid grid-cols-1 gap-y-12 p-3 pb-44 mx-auto overflow-y-auto no-scrollbar cursor-pointer'>
       <DeleteDialog
         isOpen={!!deletePostID}
         handleDelete={handleDeletePost}
@@ -132,17 +129,24 @@ export default function Feed(props: FeedProps) {
             <Card
               key={`${post.title}-${index}`}
               ref={(el) => (postRefs.current[post.id] = el)}
-              className={`min-w-full place-self-center hover:bg-zinc-50 dark:bg-zinc-900 hover:dark:bg-zinc-800`}
+              className='min-w-full flex flex-col justify-between gap-4 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:bg-zinc-900 hover:dark:bg-zinc-800 transition'
               onClick={() => handleSelectPost(post.id)}
             >
               <CardHeader>
-                <div className="w-full flex flex-row border-red-900 border-solid border-2">
-                  <CardTitle className={`text-2xl mb-1`}>{post.title}</CardTitle>
-                  { post.getHelp === true ?
-                    <Button className="" onClick={() => handleResolveHelpPost(post.id)}> Resolve </Button>
-                    :
+                <div className='w-full flex flex-row'>
+                  <CardTitle className={`text-2xl mb-1`}>
+                    {post.title}
+                  </CardTitle>
+                  {post.getHelp === true ? (
+                    <Button
+                      className=''
+                      onClick={() => handleResolveHelpPost(post.id)}
+                    >
+                      Resolve
+                    </Button>
+                  ) : (
                     <></>
-                  }
+                  )}
                 </div>
                 <CardDescription className='w-full flex justify-between text-xs '>
                   <div className='flex items-center'>
@@ -159,12 +163,15 @@ export default function Feed(props: FeedProps) {
                   </div>
                   <p>{post.createdAt}</p>
                 </CardDescription>
-                <CardDescription className={`dark:text-slate-50`}>
+                <CardDescription className={`dark:text-slate-50 py-2`}>
                   {htmlParser(post.description)}
                 </CardDescription>
               </CardHeader>
+
               <CardContent
-                className='relative w-full p-1 mx-auto overflow-hidden '
+                className={`${
+                  post.media.length > 0 ? "relative" : "hidden"
+                } w-full p-1 mx-auto overflow-hidden`}
                 onClick={(e) => e.stopPropagation()}
               >
                 <Carousel className='w-full mx-auto rounded-lg overflow-hidden'>
@@ -235,25 +242,25 @@ export default function Feed(props: FeedProps) {
                       {badge}
                     </Badge>
                   ))}
-                  {post.getHelp === null ?
+                  {post.getHelp === null ? (
                     <></>
-                    :
-                    post.getHelp ?
-                      <Badge
-                        variant={"outline"}
-                        className={`mr-2 text-red-500 dark:border-red-500`}>
-                        Help!
-                      </Badge>
-                      :
-                      !post.getHelp && post.getHelp !== null ?
-                        <Badge
-                          variant={"outline"}
-                          className={`mr-2 text-lime-500 dark:border-lime-500`}>
-                          Resolved!
-                        </Badge>
-                        :
-                        <></>
-                  }
+                  ) : post.getHelp ? (
+                    <Badge
+                      variant={"outline"}
+                      className={`mr-2 text-red-500 dark:border-red-500`}
+                    >
+                      Help!
+                    </Badge>
+                  ) : !post.getHelp && post.getHelp !== null ? (
+                    <Badge
+                      variant={"outline"}
+                      className={`mr-2 text-lime-500 dark:border-lime-500`}
+                    >
+                      Resolved!
+                    </Badge>
+                  ) : (
+                    <></>
+                  )}
                 </div>
 
                 <div className='flex items-center min-w-16 rounded-md pt-1'>
