@@ -34,24 +34,22 @@ type CommentProps = {
   userID: string;
   querykey: string[]; // necessary for optimistic updates
   maxDepth?: number;
-  commentsRef?: React.MutableRefObject<{
-    [key: number]: HTMLDivElement | null;
-  }>;
-  onReply?: (id: number, name: string) => void;
 };
 
 type State = {
   showEditor: boolean;
   commentText: string;
   expanded: boolean;
-  visReplyCount: number;
+  visibleCount: number;
+  currCommentIdx: number | null;
 };
 
 const initialState: State = {
   showEditor: false,
   commentText: "",
   expanded: false,
-  visReplyCount: 2,
+  currCommentIdx: null,
+  visibleCount: MAX_VISIBLE_REPLIES,
 };
 
 export default function Comment({
@@ -59,9 +57,6 @@ export default function Comment({
   userID,
   querykey,
   postID,
-  commentsRef,
-  maxDepth,
-  onReply,
 }: CommentProps) {
   const queryClient = useQueryClient();
 
@@ -72,15 +67,11 @@ export default function Comment({
   const { mutate: postComment, isPaused: isPendingPostComment } =
     usePostComment();
 
-  const maxDepth_ = maxDepth ?? 2;
+  const flatList = flattenCommentTree(comment);
 
-  // Dynamically determine visible replies
-  const visibleReplies = comment.replies?.slice(0, state.visReplyCount);
-
-  // Check if there are more replies left to load
-  const hasMoreReplies =
-    comment.replies && state.visReplyCount < comment.replies.length;
-  console.log(hasMoreReplies);
+  const isTruncated = state.visibleCount < flatList.length;
+  const isFullyExpanded = state.visibleCount >= flatList.length;
+  const visibleComments = flatList.slice(0, state.visibleCount);
 
   function handleCommentLike() {
     if (!comment || !userID) return;
@@ -93,11 +84,11 @@ export default function Comment({
     });
   }
 
-  function handleReply() {
-    mergeState({ showEditor: !state.showEditor });
+  function handleReply(index: number) {
+    mergeState({ showEditor: !state.showEditor, currCommentIdx: index });
   }
 
-  function handleSubmitComment() {
+  function handleSubmitComment(commentID: number) {
     if (!state.commentText) {
       showToast({
         type: "warning",
@@ -111,7 +102,7 @@ export default function Comment({
         postID,
         content: state.commentText,
         key: querykey,
-        parentCommentID: comment.id,
+        parentCommentID: commentID,
       },
       {
         onSuccess: () => {
@@ -125,94 +116,126 @@ export default function Comment({
   }
 
   return (
-    <div
-      key={comment.id}
-      className={`${
-        comment.parentCommentID ? "ml-1" : "ml-0"
-      } flex flex-col text-sm min-h-fit`}
-    >
-      <div className='w-full flex mt-3'>
-        <Avatar className='h-5 w-5 mr-2'>
-          <AvatarImage src={comment.profile.avatarURL} alt='@profilePic' />
-          <AvatarFallback>{createAcronym(comment.profile.name)}</AvatarFallback>
-        </Avatar>
+    <div className='flex flex-col gap-2 text-sm'>
+      {visibleComments.map(({ comment, depth }, index) => (
+        <div
+          key={comment.id}
+          className={`flex flex-col text-sm min-h-fit`}
+          style={{ marginLeft: depth * 16 }}
+        >
+          <div className='w-full flex mt-3'>
+            <Avatar className='h-5 w-5 mr-2'>
+              <AvatarImage src={comment.profile.avatarURL} alt='@profilePic' />
+              <AvatarFallback>
+                {createAcronym(comment.profile.name)}
+              </AvatarFallback>
+            </Avatar>
 
-        <p className='text-xs mb-2'>{comment.profile.name}</p>
-      </div>
-      <div className='pl-4 pb-2 mt-2'>{htmlParser(comment.content)}</div>
-      <div className='w-full flex justify-between items-center pl-2'>
-        <div className='flex items-center'>
-          <Button
-            variant='ghost'
-            className={`w-7 h-7 mr-0.5`}
-            onClick={handleCommentLike}
-          >
-            <ThumbsUpIcon
-              className={`${
-                comment.userHasLiked ? "text-blue-600 dark:text-blue-400" : ""
-              }`}
-            />
-          </Button>
+            <p className='text-xs mb-2'>{comment.profile.name}</p>
+          </div>
+          <div className='pl-4 pb-2 mt-2'>{htmlParser(comment.content)}</div>
+          <div className='w-full flex justify-between items-center pl-2'>
+            <div className='flex items-center'>
+              <Button
+                variant='ghost'
+                className={`w-7 h-7 mr-0.5`}
+                onClick={handleCommentLike}
+              >
+                <ThumbsUpIcon
+                  className={`${
+                    comment.userHasLiked
+                      ? "text-blue-600 dark:text-blue-400"
+                      : ""
+                  }`}
+                />
+              </Button>
 
-          <p className='mr-2 font-semibold text-accent-foreground'>
-            {comment.likeCount}
-          </p>
+              <p className='mr-2 font-semibold text-accent-foreground'>
+                {comment.likeCount}
+              </p>
 
-          <Button
-            variant='ghost'
-            className={`w-7 h-7 ${
-              state.showEditor ? "bg-zinc-300 dark:bg-zinc-700" : ""
-            }`}
-            onClick={handleReply}
-          >
-            <MessageCircle />
-          </Button>
-        </div>
+              <Button
+                variant='ghost'
+                className={`w-7 h-7 ${
+                  state.showEditor && state.currCommentIdx === index
+                    ? "bg-zinc-300 dark:bg-zinc-700"
+                    : ""
+                }`}
+                onClick={() => handleReply(index)}
+              >
+                <MessageCircle />
+              </Button>
+            </div>
 
-        <p className='text-xs'>{comment.createdAt}</p>
-      </div>
-      {state.showEditor && (
-        <div className='px-4 mt-1'>
-          <TiptapEditor
-            value={state.commentText}
-            variant='small'
-            isLoading={isPendingPostComment}
-            onChange={(value) => mergeState({ commentText: value })}
-            onSubmit={handleSubmitComment}
+            <p className='text-xs'>{comment.createdAt}</p>
+          </div>
+          {state.showEditor && state.currCommentIdx === index && (
+            <div className='px-4 mt-1'>
+              <TiptapEditor
+                value={state.commentText}
+                variant='small'
+                isLoading={isPendingPostComment}
+                onChange={(value) => mergeState({ commentText: value })}
+                onSubmit={() => handleSubmitComment(comment.id)}
+              />
+            </div>
+          )}
+
+          {isTruncated && index === visibleComments.length - 1 && (
+            <button
+              onClick={() =>
+                setState((prevState) => {
+                  return {
+                    ...prevState,
+                    visibleCount: prevState.visibleCount + MAX_VISIBLE_REPLIES,
+                  };
+                })
+              }
+              className='text-blue-500 text-xs mt-2 rounded-sm'
+            >
+              View More Replies ({flatList.length - state.visibleCount})
+            </button>
+          )}
+
+          {index === visibleComments.length - 1 &&
+            isFullyExpanded &&
+            state.visibleCount > MAX_VISIBLE_REPLIES && (
+              <button
+                onClick={() =>
+                  mergeState({ visibleCount: MAX_VISIBLE_REPLIES })
+                }
+                className='text-blue-500 text-xs mt-2 rounded-sm'
+              >
+                Collapse Replies
+              </button>
+            )}
+
+          <Separator
+            className={`${comment.parentCommentID ? "hidden" : "block"}  mt-2 `}
           />
         </div>
-      )}
-      {comment.replies && comment.replies.length > 0 && maxDepth_ > 0 && (
-        <div className='ml-2 border-l-[0.3px] pl-2'>
-          {visibleReplies?.map((reply) => (
-            <Comment
-              commentsRef={commentsRef}
-              key={reply.id}
-              comment={reply}
-              postID={postID}
-              querykey={querykey}
-              userID={userID}
-              maxDepth={maxDepth_ - 1}
-              onReply={onReply}
-            />
-          ))}
-          {/* Show More / Show Less Button */}
-          {hasMoreReplies && (
-            <Button
-              variant='ghost'
-              onClick={() => mergeState({ expanded: !state.expanded })}
-              className='text-blue-5001 p-1 text-xs'
-            >
-              {state.expanded
-                ? "Show Less Replies"
-                : `View More (${state.visReplyCount - comment.replies.length})`}
-            </Button>
-          )}
-        </div>
-      )}
-      <Separator
-        className={`${comment.parentCommentID ? "hidden" : "block"}  mt-2 `}
-      />
+      ))}
     </div>
   );
+}
+
+type DisplayComment = {
+  comment: Comment;
+  depth: number;
+};
+
+function flattenCommentTree(
+  comment: Comment,
+  depth = 0,
+  result: DisplayComment[] = []
+): DisplayComment[] {
+  result.push({ comment, depth });
+
+  if (comment.replies && comment.replies.length > 0) {
+    for (const reply of comment.replies) {
+      flattenCommentTree(reply, depth + 1, result);
+    }
+  }
+
+  return result;
 }

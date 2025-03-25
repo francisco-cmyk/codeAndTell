@@ -185,7 +185,7 @@ export function getLinkType(link: string): string {
 
 export function getEmbedURL(url: string) {
   const youtubeRegex =
-    /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/ ]{11})/;
+    /(?:youtube\.com\/(?:watch\?v=|embed\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
   const vimeoRegex = /vimeo\.com\/(\d+)/;
 
   const youtubeMatch = url.match(youtubeRegex);

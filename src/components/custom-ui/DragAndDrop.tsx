@@ -4,6 +4,7 @@ import { Button } from "../ui-lib/Button";
 
 interface DragAndDropProps {
   values?: File[];
+  link: string | undefined;
   onChange?: (files: File[]) => void;
   children?: React.ReactNode;
 }
@@ -98,12 +99,12 @@ export default function DragAndDrop(props: DragAndDropProps) {
         />
       </div>
 
-      {files.length > 0 && (
+      {files.length > 0 && !props.link && (
         <div className='w-full dark:bg-zinc-800 dark:rounded-md p-1'>
           <p className='text-gray-700 dark:text-zinc-300 font-semibold text-sm mb-2'>
             Selected Files:
           </p>
-          <div className='grid grid-cols-4 gap-2 overflow-x-auto max-h-[250px] '>
+          <div className='grid grid-cols-4 gap-2 overflow-x-auto max-h-[250px]'>
             {files.map((file, index) => (
               <div
                 key={index}
