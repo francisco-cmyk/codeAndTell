@@ -18,9 +18,8 @@ async function fetchHelpPosts(): Promise<PostDBType[] | undefined> {
     const { data } = await supabase
       .from("content")
       .select(postQuery)
-      .not("getHelp", 'is', null)
+      .not("getHelp", "is", null)
       .order("created_at", { ascending: false });
-      console.log("DATA", data)
 
     if (data) {
       return data.map((datum) => PostSchema.parse(datum));

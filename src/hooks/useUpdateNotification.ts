@@ -37,8 +37,6 @@ export default function useUpdateNotification() {
         (oldData: NotificationType[]) => {
           if (!oldData) return oldData;
 
-          console.log(oldData);
-
           return oldData.map((data) => {
             if (data.id !== notifID) return data;
 

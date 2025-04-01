@@ -1,7 +1,14 @@
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useState, useEffect } from "react";
-import { Bold, Italic, Strikethrough, Code, Link2 } from "lucide-react";
+import {
+  Bold,
+  Italic,
+  Strikethrough,
+  Code,
+  Link2,
+  Loader2,
+} from "lucide-react";
 import Link from "@tiptap/extension-link";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui-lib/Popover";
 import { Input } from "../ui-lib/Input";
@@ -36,6 +43,7 @@ type EditorProps = {
   variant?: VariantType;
   showSubmit?: boolean;
   className?: string;
+  isLoading?: boolean;
   onChange?: (content: string) => void;
   onSubmit?: (content?: string) => void;
 };
@@ -44,6 +52,7 @@ export default function TiptapEditor(props: EditorProps) {
   const [content, setContent] = useState<string>("");
   const [url, setUrl] = useState<string>("");
 
+  const isLoading = props.isLoading ?? false;
   const variant = props.variant ? Variant[props.variant] : Variant.big;
 
   const editor = useEditor({
@@ -238,7 +247,7 @@ export default function TiptapEditor(props: EditorProps) {
             disabled={!isAuthenticated}
             onClick={(e) => handleSubmitText(e)}
           >
-            send
+            {isLoading ? <Loader2 className='animate-spin' /> : "send"}
           </Button>
         </div>
       )}
