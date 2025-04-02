@@ -28,6 +28,7 @@ import DeleteDialog from "./DeleteDialog";
 import { htmlParser } from "../../lib/parser";
 import BackgroundImage from "./BackgroundImage";
 import useResolveHelpPost from "../../hooks/useResolveHelpPost";
+import { useSearchParams } from "react-router-dom";
 
 type FeedProps = {
   isLoading: boolean;
@@ -39,6 +40,7 @@ type FeedProps = {
 };
 
 export default function Feed(props: FeedProps) {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [deletePostID, setDeletePostID] = useState<string | null>(null);
 
   const { user } = useAuthContext();
@@ -231,10 +233,22 @@ export default function Feed(props: FeedProps) {
                   )}
                 </Carousel>
               </CardContent>
-              <CardFooter className='w-full flex justify-between overflow-x-auto '>
+              <CardFooter className='w-full flex justify-between overflow-x-auto'>
                 <div className='flex max-w-2/4'>
                   {post.badges.map((badge, index) => (
                     <Badge
+                      onClick={
+                        (e) => {
+                          e.stopPropagation();
+                          if (!searchParams.has("tag")) {
+                            setSearchParams({ tag: badge });
+                          } else {
+                            const newParams = new URLSearchParams(searchParams);
+                            newParams.set("tag", badge);
+                            setSearchParams(newParams, { replace: true });
+                          }
+                        }
+                      }
                       key={`${badge}-${index}`}
                       variant={"outline"}
                       className={`mr-2 dark:text-white dark:border-slate-50`}
