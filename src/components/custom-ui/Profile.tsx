@@ -171,7 +171,6 @@ export function Profile({ user }: ProfileProps) {
               showSubmit={false}
               value={state.bio}
               onChange={(val) => mergeState({ bio: val })}
-              onSubmit={() => console.log("hey")}
             />
           )}
         </div>

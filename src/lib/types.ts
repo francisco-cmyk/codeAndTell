@@ -101,6 +101,7 @@ export type UserType = {
   avatarUrl: string;
   bio: string;
   email: string;
+  contactInfo: string;
   role: string;
   lastSignInAt: string;
   provider: string;

@@ -57,6 +57,7 @@ export default function Settings() {
 
         <TabsContent value='account' className='h-full w-full overflow-y-auto'>
           <Account user={user} />
+
         </TabsContent>
         <TabsContent value='profile'>
           <Profile user={user} />

@@ -33,6 +33,7 @@ const initialUser: UserType = {
   preferredName: "",
   userName: "",
   bio: "",
+  contactInfo: "",
   role: "",
   lastSignInAt: "",
   provider: "",
@@ -71,7 +72,7 @@ export const AuthenticationProvider: React.FC<ProviderPops> = ({
   }, [session, userData]);
 
   useEffect(() => {
-    const { data } = supabase.auth.onAuthStateChange((event, _) => {
+    const { data } = supabase.auth.onAuthStateChange((event) => {
       if (event === "INITIAL_SESSION") {
         // handle initial session
       } else if (event === "SIGNED_IN") {
