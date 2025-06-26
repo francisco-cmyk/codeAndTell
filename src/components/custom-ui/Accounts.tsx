@@ -135,7 +135,7 @@ export function Account({ user }: AccountProps) {
 
         <div className='flex flex-col gap-y-2 text-sm'>
           <div className='w-full flex text-sm justify-between items-center'>
-            <span className="text-slate-400"> note: this information will be included in all your posts </span>
+            <span className="text-slate-400"> note: this information will be included below all your posts </span>
             <Button
               variant='ghost'
               className={`
@@ -151,14 +151,14 @@ export function Account({ user }: AccountProps) {
             <div className='w-full'>
               {!state.showEditContactInfo ? (
                 <div
-                  className={`h-44 overflow-y-auto rounded-md p-2 ${
+                  className={`rounded-md p-2 ${
                     state.contactInfo.length === 0
                       ? "bg-zinc-200 dark:bg-zinc-700"
                       : "border-zinc-300 dark:border-zinc-600 border-[0.5px]"
                   }`}
                 >
                   <div className='text-sm text-opacity-45'>
-                    {state.contactInfo.length > 0 ? htmlParser(state.contactInfo) : "no contact info yet.."}
+                    {state.contactInfo.length > 0 ? htmlParser(state.contactInfo) : "no contact info yet..."}
                   </div>
                 </div>
               ) : (
