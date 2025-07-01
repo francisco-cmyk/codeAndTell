@@ -19,6 +19,7 @@ const CommentSchema = z.object({
     id: z.string(),
     avatar_url: z.nullable(z.string()),
     full_name: z.nullable(z.string()),
+    contact_info: z.nullable(z.string()),
   }),
   post: z.object({
     created_at: z.string(),
@@ -30,6 +31,7 @@ const CommentSchema = z.object({
       id: z.string(),
       avatar_url: z.nullable(z.string()),
       full_name: z.nullable(z.string()),
+      contact_info: z.nullable(z.string()),
     }),
   }),
 });

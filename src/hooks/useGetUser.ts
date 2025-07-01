@@ -81,6 +81,7 @@ export default function useGetUser(params: Params) {
         avatarUrl: profileData.avatar_url,
         email: profileData.email,
         bio: profileData.bio ?? "",
+        contactInfo: profileData.contact_info ?? "",
         preferredName: "",
         userName: "",
         role: "",

@@ -13,7 +13,6 @@ const tabStyle = `text-zing-600 dark:text-zinc-300 hover:text-zinc-700 dark:hove
 data-[state=active]:border-b-black data-[state=active]:dark:border-b-zinc-300  data-[state=active]:bg-transparent data-[state=active]:shadow-none font-medium rounded-none shadow-none bg-transparent transition`;
 
 export default function Settings() {
-  const { user } = useAuthContext();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const tab = searchParams.get("tab") ?? "";
@@ -56,10 +55,11 @@ export default function Settings() {
         </TabsList>
 
         <TabsContent value='account' className='h-full w-full overflow-y-auto'>
-          <Account user={user} />
+          <Account />
+
         </TabsContent>
         <TabsContent value='profile'>
-          <Profile user={user} />
+          <Profile />
         </TabsContent>
         <TabsContent value='notifications'>Content for Tab 3</TabsContent>
         <TabsContent value='preferences'>Content for Tab 4</TabsContent>

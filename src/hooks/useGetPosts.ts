@@ -71,6 +71,7 @@ export default function useGetPosts() {
           id: datum.profiles.id,
           avatarURL: datum.profiles.avatar_url ?? defaultAvatar,
           name: datum.profiles.full_name ?? defaultName,
+          contact_info: datum.profiles.contact_info ?? "",
         },
         commentCount: datum.comments.length ?? 0,
         comments: datum.comments.map((comment) => ({
