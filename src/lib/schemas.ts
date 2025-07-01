@@ -18,6 +18,7 @@ export const PostSchema = z.object({
     id: z.string(),
     avatar_url: z.nullable(z.string()),
     full_name: z.nullable(z.string()),
+    contact_info: z.nullable(z.string()),
   }),
   comments: z.array(
     z.object({
@@ -32,6 +33,7 @@ export const PostSchema = z.object({
         id: z.string(),
         avatar_url: z.nullable(z.string()),
         full_name: z.nullable(z.string()),
+        contact_info: z.nullable(z.string()),
       }),
     })
   ),

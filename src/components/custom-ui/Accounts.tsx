@@ -1,6 +1,5 @@
 import { Separator } from "../ui-lib/Separator";
 import { PencilIcon, Trash } from "lucide-react";
-import { UserType } from "../../lib/types";
 import { Button } from "../ui-lib/Button";
 import { useState } from "react";
 import { htmlParser } from "../../lib/parser";
@@ -8,11 +7,8 @@ import TiptapEditor from "./TipTapEditor";
 import getMergeState, { getDiff, showToast } from "../../lib/utils";
 import DeleteDialog from "./DeleteDialog";
 import useDeleteUser from "../../hooks/useDeleteUser";
-import useUpdateProfile from "../../hooks/useUpdateProfle";
-
-type AccountProps = {
-  user: UserType;
-};
+import useUpdateAccount from "../../hooks/useUpdateAccount";
+import { useAuthContext } from "../../context/auth";
 
 type State = {
   contactInfo: string;
@@ -24,14 +20,16 @@ const initialState: State = {
   showEditContactInfo: false,
 };
 
-export function Account({ user }: AccountProps) {
+export function Account() {
+  const { user } = useAuthContext();
+  console.log('USER ---->', user);
   const [state, setState] = useState({
     ...initialState,
     contactInfo: user.contactInfo,
   });
 
   const mergeState = getMergeState(setState);
-  const { mutate: updateProfile } = useUpdateProfile();
+  const { mutate: updateAccount } = useUpdateAccount();
   const [showDelete, setShowDelete] = useState(false);
   const { mutate: deleteAccount } = useDeleteUser();
 
@@ -42,7 +40,7 @@ export function Account({ user }: AccountProps) {
     );
 
     if (Object.entries(diff).length > 0) {
-      updateProfile(
+      updateAccount(
         {
           ...diff,
           userID: user.id,
@@ -152,13 +150,13 @@ export function Account({ user }: AccountProps) {
               {!state.showEditContactInfo ? (
                 <div
                   className={`rounded-md p-2 ${
-                    state.contactInfo.length === 0
+                    user.contactInfo.length === 0
                       ? "bg-zinc-200 dark:bg-zinc-700"
                       : "border-zinc-300 dark:border-zinc-600 border-[0.5px]"
                   }`}
                 >
                   <div className='text-sm text-opacity-45'>
-                    {state.contactInfo.length > 0 ? htmlParser(state.contactInfo) : "no contact info yet..."}
+                    {user.contactInfo.length > 0 ? htmlParser(user.contactInfo) : "no contact info yet..."}
                   </div>
                 </div>
               ) : (

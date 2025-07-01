@@ -17,7 +17,7 @@ export default function useUpdateProfile() {
       const { error } = await supabase
         .from("profiles")
         .update({
-          ...(params.contactInfo ? { avatar_url: params.contactInfo } : {}),
+          ...(params.contactInfo ? { contact_info: params.contactInfo } : {}),
         })
         .eq("id", params.userID);
 

@@ -1,5 +1,4 @@
 import { Pencil, PencilIcon } from "lucide-react";
-import { UserType } from "../../lib/types";
 import { Button } from "../ui-lib/Button";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui-lib/Avatar";
 import { useState } from "react";
@@ -8,10 +7,7 @@ import { htmlParser } from "../../lib/parser";
 import getMergeState, { getDiff, showToast } from "../../lib/utils";
 import { Input } from "../ui-lib/Input";
 import useUpdateProfile from "../../hooks/useUpdateProfle";
-
-type ProfileProps = {
-  user: UserType;
-};
+import { useAuthContext } from "../../context/auth";
 
 type State = {
   name: string;
@@ -33,7 +29,8 @@ const initialState: State = {
   showEditMediaLinks: false,
 };
 
-export function Profile({ user }: ProfileProps) {
+export function Profile() {
+  const { user } = useAuthContext();
   const [state, setState] = useState({
     ...initialState,
     name: user.name,
@@ -130,7 +127,7 @@ export function Profile({ user }: ProfileProps) {
             ) : (
               <>
                 <p className='text-xs italic'>name</p>
-                <p className='font-semibold text-lg'>{state.name}</p>
+                <p className='font-semibold text-lg'>{user.name}</p>
               </>
             )}
           </div>
@@ -157,13 +154,13 @@ export function Profile({ user }: ProfileProps) {
           {!state.showEditBio ? (
             <div
               className={`h-44 overflow-y-auto rounded-md p-2 ${
-                state.bio.length === 0
+                user.bio.length === 0
                   ? "bg-zinc-200 dark:bg-zinc-700"
                   : "border-zinc-300 dark:border-zinc-600 border-[0.5px]"
               }`}
             >
               <div className='text-sm text-opacity-45'>
-                {state.bio.length > 0 ? htmlParser(state.bio) : "no bio yet.."}
+                {user.bio.length > 0 ? htmlParser(user.bio) : "no bio yet.."}
               </div>
             </div>
           ) : (
