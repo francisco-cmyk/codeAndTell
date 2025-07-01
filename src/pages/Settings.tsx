@@ -5,7 +5,6 @@ import {
   TabsTrigger,
   TabsContent,
 } from "../components/ui-lib/Tabs";
-import { useAuthContext } from "../context/auth";
 import { Account } from "../components/custom-ui/Accounts";
 import { Profile } from "../components/custom-ui/Profile";
 

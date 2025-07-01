@@ -216,6 +216,7 @@ type Comment = {
     id: string;
     avatarURL: string;
     name: string;
+    contactInfo: string;
   };
 };
 

@@ -22,6 +22,7 @@ async function fetchPosts(): Promise<PostDBType[] | undefined> {
       .order("created_at", { ascending: false });
 
     if (data) {
+      console.log("DATA ----->", data);
       return data.map((datum) => PostSchema.parse(datum));
     } else {
       return [];
@@ -71,7 +72,7 @@ export default function useGetPosts() {
           id: datum.profiles.id,
           avatarURL: datum.profiles.avatar_url ?? defaultAvatar,
           name: datum.profiles.full_name ?? defaultName,
-          contact_info: datum.profiles.contact_info ?? "",
+          contactInfo: datum.profiles.contact_info ?? "",
         },
         commentCount: datum.comments.length ?? 0,
         comments: datum.comments.map((comment) => ({
@@ -88,6 +89,7 @@ export default function useGetPosts() {
             id: comment.profiles.id,
             avatarURL: comment.profiles.avatar_url ?? defaultAvatar,
             name: comment.profiles.full_name ?? defaultName,
+            contactInfo: comment.profiles.contact_info ?? ""
           },
         })),
       }));

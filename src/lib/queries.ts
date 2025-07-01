@@ -21,7 +21,8 @@ getHelp,
 profiles (
     id,
     full_name,
-    avatar_url
+    avatar_url,
+    contact_info
 ),
 comments!post_id (
   id,
@@ -34,7 +35,8 @@ comments!post_id (
   profiles!comments_user_id_fkey (
     id,
     full_name,
-    avatar_url
+    avatar_url,
+    contact_info
   )
 )
 `;
