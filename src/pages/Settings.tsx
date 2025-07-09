@@ -7,6 +7,7 @@ import {
 } from "../components/ui-lib/Tabs";
 import { Account } from "../components/custom-ui/Accounts";
 import { Profile } from "../components/custom-ui/Profile";
+import { Preferences } from "../components/custom-ui/Preferences";
 
 const tabStyle = `text-zing-600 dark:text-zinc-300 hover:text-zinc-700 dark:hover:text-zinc-400 border-b-2 p-1 px-3 hover:border-b-black dark:hover:border-b-zinc-300
 data-[state=active]:border-b-black data-[state=active]:dark:border-b-zinc-300  data-[state=active]:bg-transparent data-[state=active]:shadow-none font-medium rounded-none shadow-none bg-transparent transition`;
@@ -45,9 +46,6 @@ export default function Settings() {
           <TabsTrigger value='profile' className={tabStyle}>
             profile
           </TabsTrigger>
-          <TabsTrigger value='notifications' className={tabStyle}>
-            notifications
-          </TabsTrigger>
           <TabsTrigger value='preferences' className={tabStyle}>
             preferences
           </TabsTrigger>
@@ -60,8 +58,9 @@ export default function Settings() {
         <TabsContent value='profile'>
           <Profile />
         </TabsContent>
-        <TabsContent value='notifications'>Content for Tab 3</TabsContent>
-        <TabsContent value='preferences'>Content for Tab 4</TabsContent>
+        <TabsContent value='preferences'>
+          <Preferences />
+        </TabsContent>
       </Tabs>
     </div>
   );

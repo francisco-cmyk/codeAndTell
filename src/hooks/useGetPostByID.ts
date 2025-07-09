@@ -103,6 +103,7 @@ export default function useGetUserPostByID(params: Params) {
           id: data.profiles.id,
           avatarURL: data.profiles.avatar_url ?? defaultAvatar,
           name: data.profiles.full_name ?? defaultName,
+          contactInfo: data.profiles.contact_info ?? "",
         },
         commentCount: data.comments.length ?? 0,
         comments: data.comments.map((comment) => ({

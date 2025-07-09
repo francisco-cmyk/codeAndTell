@@ -152,6 +152,10 @@ export default function PostView() {
             )}
           </Carousel>
         </div>
+        <div className="p-4 dark:bg-zinc-700 rounded-lg">
+          <p><b>contact info:</b></p>
+          <p className="pl-4">{post.profile.contactInfo ? htmlParser(post.profile.contactInfo) : "no contact information attached"}</p>
+        </div>
         <div className='footer mb-3'>
           <div className='flex max-w-2/4'>
             {post.badges.map((badge, index) => (
