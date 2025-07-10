@@ -28,6 +28,7 @@ export type PostType = {
     id: string;
     avatarURL: string;
     name: string;
+    contactInfo: string;
   };
   commentCount: number;
   comments: {
@@ -42,6 +43,7 @@ export type PostType = {
       id: string;
       avatarURL: string;
       name: string;
+      contactInfo: string;
     };
   }[];
 };
@@ -57,6 +59,7 @@ export type CommentType = {
     id: string;
     avatarURL: string;
     name: string;
+    contactInfo: string;
   };
   post: {
     createdAt: string;
@@ -67,6 +70,7 @@ export type CommentType = {
       id: string;
       avatarURL: string;
       name: string;
+      contactInfo: string;
     };
   };
 };
@@ -90,6 +94,7 @@ export type NotificationType = {
     id: string;
     avatarURL: string;
     name: string;
+    contactInfo: string;
   };
 };
 
