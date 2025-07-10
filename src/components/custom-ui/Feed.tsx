@@ -135,13 +135,14 @@ export default function Feed(props: FeedProps) {
               onClick={() => handleSelectPost(post.id)}
             >
               <CardHeader>
-                <div className='w-full flex flex-row'>
+                <div className='w-full flex justify-between'>
                   <CardTitle className={`text-2xl mb-1`}>
                     {post.title}
                   </CardTitle>
                   {post.getHelp === true ? (
                     <Button
-                      className=''
+                      className='text-xs p-2 bg-transparent border-2 border-solid border-zinc-900 dark:border-slate-50 dark:text-slate-50
+                      hover:bg-slate-50 hover:text-zinc-900'
                       onClick={() => handleResolveHelpPost(post.id)}
                     >
                       Resolve

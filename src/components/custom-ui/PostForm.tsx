@@ -176,19 +176,22 @@ export default function PostForm({ post, onSubmit }: FormProps) {
               control={form.control}
               name='getHelp'
               render={({ field }) => (
-                <FormItem className='mt-2 flex flex-row items-center'>
+                <FormItem className='mt-2'>
                   <FormLabel id='getHelp' className=''>
                     Need Help?
                   </FormLabel>
-                  <Checkbox
-                    className=''
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                  <FormMessage className='ml-4 text-lime-500'>
-                    When your question is answered, remember to edit your post
-                    and mark it as resolved!
-                  </FormMessage>
+                  <div className="flex flex-row">
+                    <Checkbox
+                      className=''
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                    <FormMessage className='ml-4 text-lime-500'>
+                      When your question is answered, remember to edit your post
+                      and mark it as resolved!
+                    </FormMessage>
+                  </div>
+
                 </FormItem>
               )}
             />
